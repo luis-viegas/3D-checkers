@@ -1,4 +1,5 @@
 import { CGFXMLreader } from '../lib/CGF.js';
+import { MyCylinder } from './MyCylinder.js';
 import { MyRectangle } from './MyRectangle.js';
 import { MyTriangle } from './MyTriangle.js';
 
@@ -578,7 +579,7 @@ export class MySceneGraph {
                 var z1 = this.reader.getFloat(grandChildren[0], 'z1');
                 if (!(z1 != null && !isNaN(z1)))
                     return "unable to parse z1 of the primitive coordinates for ID = " + primitiveId;
-                    
+
                 // x2
                 var x2 = this.reader.getFloat(grandChildren[0], 'x2');
                 if (!(x2 != null && !isNaN(x2)))
@@ -612,6 +613,17 @@ export class MySceneGraph {
                 var triangle = new MyTriangle(this.scene, primitiveId, x1, y1,z1,x2, y2,z2,x3,y3,z3);
 
                 this.primitives[primitiveId] = triangle;
+            }
+            else if(primitiveType == 'cylinder'){
+                //TODO Input validation in cylinder
+                let base = this.reader.getFloat(grandChildren[0], 'base');
+                let top = this.reader.getFloat(grandChildren[0], 'top');
+                let height = this.reader.getFloat(grandChildren[0], 'height');
+                let slices = this.reader.getInteger(grandChildren[0], 'slices');
+                let stacks = this.reader.getInteger(grandChildren[0], 'stacks');
+
+                var cylinder = new MyCylinder(this.scene, primitiveId, base, top, height,slices,stacks )
+                this.primitives[primitiveId] = cylinder;
             }
             else{
 
@@ -795,6 +807,6 @@ export class MySceneGraph {
         //TODO: Create display loop for transversing the scene graph
 
         //To test the parsing/creation of the primitives, call the display function directly
-        this.primitives['demoTriangle'].display();
+        this.primitives['demoCylinder'].display();
     }
 }
