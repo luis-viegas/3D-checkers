@@ -2,6 +2,7 @@ import { CGFXMLreader } from '../lib/CGF.js';
 import { MyCylinder } from './MyCylinder.js';
 import { MyRectangle } from './MyRectangle.js';
 import { MyTriangle } from './MyTriangle.js';
+import { MySphere } from './MySphere.js';
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -625,6 +626,15 @@ export class MySceneGraph {
                 var cylinder = new MyCylinder(this.scene, primitiveId, base, top, height,slices,stacks )
                 this.primitives[primitiveId] = cylinder;
             }
+            else if(primitiveType == 'sphere'){
+                //TODO Input validation in sphere
+                let radius = this.reader.getFloat(grandChildren[0], 'radius');
+                let slices = this.reader.getInteger(grandChildren[0], 'slices');
+                let stacks = this.reader.getInteger(grandChildren[0], 'stacks');
+
+                var sphere = new MySphere(this.scene, primitiveId, radius,slices,stacks )
+                this.primitives[primitiveId] = sphere;
+            }
             else{
 
                 console.warn("To do: Parse other primitives.");
@@ -807,6 +817,6 @@ export class MySceneGraph {
         //TODO: Create display loop for transversing the scene graph
 
         //To test the parsing/creation of the primitives, call the display function directly
-        this.primitives['demoCylinder'].display();
+        this.primitives['demoSphere'].display();
     }
 }
