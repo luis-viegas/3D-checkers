@@ -76,8 +76,7 @@ export class MyTriangle extends CGFobject {
 		this.texCoords = [
 			0, 1,
 			1, 1,
-			0, 0,
-			1, 0
+			0, 0
 		]
 		this.primitiveType = this.scene.gl.TRIANGLES;
 		this.initGLBuffers();
@@ -123,6 +122,10 @@ export class MyTriangle extends CGFobject {
         return N;
     }
 
+
+    /**
+     * Function that calculates the primitive u and v
+    */
     calculateUVTextureMapping(){
         
     }

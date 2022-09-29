@@ -53,8 +53,6 @@ export class MySphere extends CGFobject {
                 this.texCoords.push(stStep/this.stacks)
 
             }
-
-        
         }
 
         for(let i =0; i < this.stacks; i++){

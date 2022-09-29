@@ -58,9 +58,8 @@ export class MyCylinder extends CGFobject {
                 vertex += 2;
             }
             
-            //TODO Normals and Textures
+            //TODO Textures
             //Normais com o método de Smooth Shading de Gouraud
-            
             this.normals.push(tempRadius*Math.sin(angle) + (tempRadius + radiusStep)*Math.sin(angle),tempRadius*Math.cos(angle) + (tempRadius+radiusStep)*Math.cos(angle) , tempZ +tempZ + heightStep);
             this.normals.push(tempRadius*Math.sin(angle) + (tempRadius + radiusStep)*Math.sin(angle),tempRadius*Math.cos(angle) + (tempRadius+radiusStep)*Math.cos(angle) , tempZ +tempZ + heightStep);
             
