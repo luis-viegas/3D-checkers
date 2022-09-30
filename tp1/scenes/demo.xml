@@ -36,10 +36,13 @@
     </materials>
 
     <transformations>
-        <transformation id="demoTransform">
-            <scale x="5" y="1" z="5" />
-            <rotate axis="x" angle="-45" />
-            <rotate axis="z" angle="-45" />
+        <transformation id="transformIceCream">
+            <translate x="0" y="10" z="0"/>
+            <rotate axis="x" angle="90"/>
+        </transformation>
+
+        <transformation id="transformationGround">
+            <scale x="10" y="1" z="10"/>
         </transformation>
     </transformations>
 
@@ -51,25 +54,74 @@
             <triangle x1="-1.5" y1="0" z1="-0.75" x2="0" y2="0" z2="1.25" x3="1.5" y3="0" z3="-0.75" />
         </primitive>
         <primitive id="demoCylinder">
-            <cylinder base="1.5" top="2" height="6" slices="40" stacks="60"/>
+            <cylinder base="2.5" top="0" height="10" slices="40" stacks="60"/>
         </primitive>
         <primitive id="demoSphere"> 
-            <sphere  radius="3" slices="20" stacks="20" />
+            <sphere  radius="2.35" slices="20" stacks="20"/>
         </primitive>
+        <primitive id="sphere2"> 
+            <sphere  radius="1.5" slices="20" stacks="20"/>
+        </primitive>
+        <primitive id="demoTorus">
+            <torus inner="0.25" outer="2.5" slices="50" loops="50"/> 
+        </primitive>
+        
     </primitives>
 
     <components>
-        <component id="demoRoot">
+        <component id="iceCream">
             <transformation>
-                <translate x="0" y="0" z="1" />
-                <scale x="2" y="1" z="1" />
+                <transformationref id="transformIceCream">
+            </transformation>
+            <materials>
+                <material id="inherit">
+            </materials>
+            <texture id="demoTexture"/>
+            <children>
+                <primitiveref id="demoTorus" />
+                <primitiveref id="demoSphere" />
+                <primitiveref id="demoCylinder"/>
+            </children>
+        </component>
+
+        <component id="ground">
+            <transformation>
+                <transformationref id="transformationGround"/>
+            </transformation>
+            <materials>
+                <material id="inherit">
+            </materials>
+            <texture id="demoTexture"/>
+            <children>
+                <primitiveref id="demoRectangle" />
+            </children>
+        </component>
+
+        <component id="iceBall2">
+            <transformation>
+                <translate x="0" y="11.5" z="0"/>
             </transformation>
             <materials>
                 <material id="demoMaterial" />
             </materials>
             <texture id="demoTexture"/>
             <children>
-                <primitiveref id="demoRectangle" />
+                <primitiveref id="sphere2"/>
+            </children>
+        </component>
+
+        <component id="demoRoot">
+            <transformation>
+            </transformation>
+            <materials>
+                <material id="demoMaterial" />
+            </materials>
+            <texture id="demoTexture"/>
+            <children>
+                <componentref id="iceCream" />
+                <primitiveref id="demoTriangle"/>
+                <componentref id="ground"/>
+                <componentref id="iceBall2"/>
             </children>
         </component>
     </components>
