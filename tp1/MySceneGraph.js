@@ -806,7 +806,6 @@ export class MySceneGraph {
    */
   parseComponents(componentsNode) {
     var children = componentsNode.children;
-    console.log(componentsNode)
     this.components = [];
 
     var grandChildren = [];
@@ -882,7 +881,8 @@ export class MySceneGraph {
       let childrenComponents = this.parseComponentsChildren(grandgrandChildren);
 
       if(typeof childrenComponents == "string"){ return childrenComponents} //Means it is an error message
-      this.components[componentID].children = childrenComponents;
+      this.components[componentID].children = childrenComponents.children;
+      this.components[componentID].primitives = childrenComponents.primitives;
 
     }
 
@@ -1073,6 +1073,7 @@ export class MySceneGraph {
     //TODO tweak this to spearate child components and primitives because of materials
     if(children.length == 0){ return "There should be at least one component or a primitive"}
     let componentChildren = [];
+    let primitives = [];
     for(let i = 0; i < children.length; i++){
       const child = children[i];
 
@@ -1086,7 +1087,7 @@ export class MySceneGraph {
         case "primitiveref": 
           const primitiveId = this.reader.getString(child, "id")
           if(this.primitives[primitiveId] == null){return "There is no component named " + primitiveId}
-          componentChildren.push(this.primitives[primitiveId])
+          primitives.push(this.primitives[primitiveId])
           break;
 
         default:
@@ -1095,7 +1096,10 @@ export class MySceneGraph {
 
     }
 
-    return componentChildren;
+    return {
+      'children' : componentChildren,
+      'primitives' : primitives
+    };
 
   }
 

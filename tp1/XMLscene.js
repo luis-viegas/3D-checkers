@@ -158,17 +158,15 @@ export class XMLscene extends CGFscene {
         for(let i = 0; i< component.children.length; i++){
             this.pushMatrix();
 
-            if(component.children[i].hasOwnProperty('children')){
-                this.drawComponent(component.children[i])
-            }
-            else{
-                component.children[i].display();
-            }
-
-            
+            this.drawComponent(component.children[i])
 
             this.popMatrix()
 
+        }
+
+
+        for(let j= 0; j< component.primitives.length; j++){
+            component.primitives[j].display()
         }
     }
 }
