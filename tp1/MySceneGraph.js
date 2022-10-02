@@ -394,6 +394,7 @@ export class MySceneGraph {
    * @param {textures block element} texturesNode
    */
   parseTextures(texturesNode) {
+    //TODO texture parsing
     //For each texture in textures block, check ID and file URL
     this.onXMLMinorError("To do: Parse textures.");
     return null;
@@ -428,7 +429,7 @@ export class MySceneGraph {
           "ID must be unique for each light (conflict: ID = " + materialID + ")"
         );
 
-      //Continue here
+      //CTODO material parsing
       this.onXMLMinorError("To do: Parse materials.");
     }
 
@@ -446,6 +447,7 @@ export class MySceneGraph {
     this.transformations = [];
 
     var grandChildren = [];
+    
 
     // Any number of transformations.
     for (var i = 0; i < children.length; i++) {
@@ -487,11 +489,51 @@ export class MySceneGraph {
             );
             break;
           case "scale":
-            this.onXMLMinorError("To do: Parse scale transformations.");
+            var coordinates = this.parseCoordinates3D(
+              grandChildren[j],
+              "scale transformation for ID " + transformationID
+            );
+            if (!Array.isArray(coordinates)) return coordinates;
+            transfMatrix = mat4.scale(
+              transfMatrix,
+              transfMatrix,
+              coordinates
+            );
             break;
           case "rotate":
-            // angle
-            this.onXMLMinorError("To do: Parse rotate transformations.");
+            let axis = this.reader.getString(grandChildren[j], "axis");
+            if(axis != "x" && axis!= "y" && axis!="z"){
+              return ("Invalid axis received: " + axis );
+            }
+
+            let angle = this.reader.getFloat(grandChildren[j], "angle");
+            if(angle == null || isNaN(angle) ){
+              return ("Invalid angle received: " + angle );
+            }
+            
+            let axisVector = []
+            switch (axis){
+              case 'x':
+                axisVector.push(...[1,0,0])
+                break;
+              case 'y':
+                axisVector.push(...[0,1,0])
+                break;
+              case 'z':
+                axisVector.push(...[0,0,1])
+                break;
+            }
+
+            let angleRad = (angle * Math.PI) / 180.0;
+            console.log(angleRad)
+            transfMatrix = mat4.rotate(
+              transfMatrix,
+              transfMatrix,
+              angleRad,
+              axisVector
+            )
+            
+            this.log("Parsed rotation of " + angle + " in axis " + axis)
             break;
         }
       }
@@ -730,12 +772,21 @@ export class MySceneGraph {
   }
 
   /**
+   * Component Element shall be:
+   * components.id ->
+   *  - transformation
+   *  - materials
+   *  - textures
+   *  - children
+   */
+
+  /**
    * Parses the <components> block.
    * @param {components block element} componentsNode
    */
   parseComponents(componentsNode) {
     var children = componentsNode.children;
-
+    console.log(componentsNode)
     this.components = [];
 
     var grandChildren = [];
@@ -760,7 +811,8 @@ export class MySceneGraph {
           componentID +
           ")"
         );
-
+      
+      this.components[componentID] = {}
       grandChildren = children[i].children;
 
       nodeNames = [];
@@ -773,16 +825,52 @@ export class MySceneGraph {
       var textureIndex = nodeNames.indexOf("texture");
       var childrenIndex = nodeNames.indexOf("children");
 
-      this.onXMLMinorError("To do: Parse components.");
       // Transformations
+      if(transformationIndex == null){
+        return ("There should be a 'transformation' camp, even if empty")
+      }
+
+      grandgrandChildren = grandChildren[transformationIndex].children;
+      //There are no transformations
+      if(grandgrandChildren.length == 0){
+        this.log("Component " + componentID + " has no transformations");
+      }
+      else{
+        //Verify if it a transformationref and there is no more than 1
+        if(grandgrandChildren[0].nodeName == "transformationref" && grandgrandChildren.length >1){
+          return "There can only be one reference to a transformation";
+        } 
+
+        let transformationMatrix= this.parseComponentTransformation(grandgrandChildren)
+        if(typeof transformationMatrix == "string"){ return transformationMatrix}
+        this.components[componentID].transformation = transformationMatrix;
+
+      }
 
       // Materials
+      grandgrandChildren = []
 
       // Texture
 
       // Children
+      grandgrandChildren = []
+
+      if(childrenIndex == null){
+        return ("There should be a 'children' camp, and cannot be empty")
+      }
+      grandgrandChildren = grandChildren[childrenIndex].children;
+      let childrenComponents = this.parseComponentsChildren(grandgrandChildren);
+
+      if(typeof childrenComponents == "string"){ return childrenComponents} //Means it is an error message
+      this.components[componentID].children = childrenComponents;
+
     }
+
+    console.log(this.components)
+    this.log(this.idRoot)
   }
+
+  
 
   /**
    * Parse the coordinates from a node with ID = id
@@ -866,6 +954,131 @@ export class MySceneGraph {
     color.push(...[r, g, b, a]);
 
     return color;
+  }
+
+  /**
+   * Parse the transformations of a component
+   * Returns the transformation matrix of a component or null if there is no transformation
+   * @param {block element} transformations 
+   */
+   parseComponentTransformation(transformationsComp){
+  
+    if(transformationsComp[0].nodeName == "transformationref"){
+      //Get transformation id and verify if it exists
+      let transformationId = this.reader.getString(transformationsComp[0], "id")
+      if(this.transformations[transformationId] == null){ return "Id " + transformationId +" does not reference any transformation"}
+
+      return this.transformations[transformationId];
+    }
+    else{
+      let transfMatrix = mat4.create()
+      //There are only normal transformations:
+      for (var j = 0; j < transformationsComp.length; j++) {
+        switch (transformationsComp[j].nodeName) {
+          case "translate":
+            var coordinates = this.parseCoordinates3D(
+              transformationsComp[j],
+              "translate transformation"
+            );
+
+            if (!Array.isArray(coordinates)) return coordinates;
+
+            transfMatrix = mat4.translate(
+              transfMatrix,
+              transfMatrix,
+              coordinates
+            );
+            break;
+          case "scale":
+            var coordinates = this.parseCoordinates3D(
+              transformationsComp[j],
+              "scale transformation" 
+            );
+            if (!Array.isArray(coordinates)) return coordinates;
+
+            transfMatrix = mat4.scale(
+              transfMatrix,
+              transfMatrix,
+              coordinates
+            );
+
+            break;
+          case "rotate":
+            let axis = this.reader.getString(transformationsComp[j], "axis");
+            if(axis != "x" && axis!= "y" && axis!="z"){
+              return ("Invalid axis received: " + axis );
+            }
+
+            let angle = this.reader.getFloat(transformationsComp[j], "angle");
+            if(angle == null || isNaN(angle) ){
+              return ("Invalid angle received: " + angle );
+            }
+
+            
+            let axisVector = []
+            switch (axis){
+              case 'x':
+                axisVector.push(...[1,0,0])
+                break;
+              case 'y':
+                axisVector.push(...[0,1,0])
+                break;
+              case 'z':
+                axisVector.push(...[0,0,1])
+                break;
+            }
+
+            let angleRad = (angle * Math.PI) / 180.0;
+            console.log(angleRad)
+            transfMatrix = mat4.rotate(
+              transfMatrix,
+              transfMatrix,
+              angleRad,
+              axisVector
+            )
+            
+            this.log("Parsed rotation of " + angle + " in axis " + axis)
+            break;
+        }
+      }
+      return transfMatrix;
+      
+    }
+  }
+
+  /**
+   * Parses the children components of a component
+   * Returns the list of components or a string having an message error
+   * @param {block of elements} children 
+   */
+  parseComponentsChildren(children){
+
+    if(children.length == 0){ return "There should be at least one component or a primitive"}
+    let componentChildren = [];
+    for(let i = 0; i < children.length; i++){
+      const child = children[i];
+
+      switch (child.nodeName) {
+        case "componentref":
+          const componentId = this.reader.getString(child, "id")
+          if(this.components[componentId] == null){return "There is no component named " + componentId}
+          componentChildren.push(this.components[componentId])
+          break;
+        
+        case "primitiveref": 
+          const primitiveId = this.reader.getString(child, "id")
+          if(this.primitives[primitiveId] == null){return "There is no component named " + primitiveId}
+          componentChildren.push(this.primitives[primitiveId])
+          break;
+
+        default:
+          return "Invalid block of information: " + child.nodeName + ". Should be 'componentref' of 'primitiveref'"
+      }
+
+    }
+
+    return componentChildren;
+
   }
 
   /*

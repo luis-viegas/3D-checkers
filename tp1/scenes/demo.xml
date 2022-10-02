@@ -42,7 +42,9 @@
         </transformation>
 
         <transformation id="transformationGround">
-            <scale x="10" y="1" z="10"/>
+            <scale x="15" y="1" z="15"/>
+            <translate x="-0.5" y="0" z="0.5"/>
+            <rotate axis="x" angle="-90"/>
         </transformation>
     </transformations>
 
@@ -71,10 +73,10 @@
     <components>
         <component id="iceCream">
             <transformation>
-                <transformationref id="transformIceCream">
+                <transformationref id="transformIceCream"/>
             </transformation>
             <materials>
-                <material id="inherit">
+                <material id="inherit"/>
             </materials>
             <texture id="demoTexture"/>
             <children>
@@ -83,23 +85,21 @@
                 <primitiveref id="demoCylinder"/>
             </children>
         </component>
-
         <component id="ground">
             <transformation>
                 <transformationref id="transformationGround"/>
             </transformation>
             <materials>
-                <material id="inherit">
+                <material id="inherit"/>
             </materials>
             <texture id="demoTexture"/>
             <children>
                 <primitiveref id="demoRectangle" />
             </children>
         </component>
-
         <component id="iceBall2">
             <transformation>
-                <translate x="0" y="11.5" z="0"/>
+                <translate x="0" y="12.5" z="0"/>
             </transformation>
             <materials>
                 <material id="demoMaterial" />
@@ -109,7 +109,6 @@
                 <primitiveref id="sphere2"/>
             </children>
         </component>
-
         <component id="demoRoot">
             <transformation>
             </transformation>

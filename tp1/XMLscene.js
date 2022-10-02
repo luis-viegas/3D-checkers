@@ -44,7 +44,7 @@ export class XMLscene extends CGFscene {
      * Initializes the scene cameras.
      */
     initCameras() {
-        this.camera = new CGFcamera(0.4, 0.1, 500, vec3.fromValues(15, 15, 15), vec3.fromValues(0, 0, 0));
+        this.camera = new CGFcamera(0.4, 0.1, 500, vec3.fromValues(50, 100, 15), vec3.fromValues(0, 0, 0));
     }
     /**
      * Initializes the scene lights with the values read from the XML file.
@@ -136,10 +136,39 @@ export class XMLscene extends CGFscene {
             this.setDefaultAppearance();
 
             // Displays the scene (MySceneGraph function).
-            this.graph.displayScene();
+            const idRoot = this.graph.idRoot
+            const root = this.graph.components[idRoot];
+            this.drawComponent(root)
         }
 
         this.popMatrix();
         // ---- END Background, camera and axis setup
+    }
+
+    /**
+     * Draws the component received and recursively (top-down, depth-first)
+     * draws its children
+     * @param {object} component 
+     */
+    drawComponent(component){
+
+        if (component.transformation != undefined) 
+            this.multMatrix(component.transformation)
+        
+        for(let i = 0; i< component.children.length; i++){
+            this.pushMatrix();
+
+            if(component.children[i].hasOwnProperty('children')){
+                this.drawComponent(component.children[i])
+            }
+            else{
+                component.children[i].display();
+            }
+
+            
+
+            this.popMatrix()
+
+        }
     }
 }
