@@ -406,7 +406,7 @@ export class MySceneGraph {
    */
   parseMaterials(materialsNode) {
     var children = materialsNode.children;
-
+    const materialProperties = ["emission", "diffuse", "ambient", "specular"]
     this.materials = [];
 
     var grandChildren = [];
@@ -428,12 +428,32 @@ export class MySceneGraph {
         return (
           "ID must be unique for each light (conflict: ID = " + materialID + ")"
         );
+      
+      //Get material shininess
+      let shininess = this.reader.getFloat(children[i], "shininess");
+      if(shininess == null) return "Material shininess value: " + shininess + "not valid"
+      
+      this.materials[materialID]={}
+      this.materials[materialID].shininess = shininess;
+      grandChildren = children[i].children;
 
-      //CTODO material parsing
-      this.onXMLMinorError("To do: Parse materials.");
+      for(let j= 0; j< grandChildren.length; j++){
+        const node = grandChildren[j].nodeName;
+        this.log(node)
+        if(node in materialProperties)
+          return "Parameters for a material must be emission, diffuse, ambient or specular. Not: " + node;
+        
+        let color = this.parseColor(grandChildren[j], "node with ID: " + node)
+
+        if(typeof color == 'string') return color;
+
+        this.materials[materialID][node] = color;
+        
+      }
     }
 
     //this.log("Parsed materials");
+    console.log(this.materials)
     return null;
   }
 
@@ -776,7 +796,7 @@ export class MySceneGraph {
    * components.id ->
    *  - transformation
    *  - materials
-   *  - textures
+   *  - texture
    *  - children
    */
 
@@ -866,8 +886,6 @@ export class MySceneGraph {
 
     }
 
-    console.log(this.components)
-    this.log(this.idRoot)
   }
 
   
@@ -1052,7 +1070,7 @@ export class MySceneGraph {
    * @param {block of elements} children 
    */
   parseComponentsChildren(children){
-
+    //TODO tweak this to spearate child components and primitives because of materials
     if(children.length == 0){ return "There should be at least one component or a primitive"}
     let componentChildren = [];
     for(let i = 0; i < children.length; i++){
