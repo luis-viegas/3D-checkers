@@ -1,4 +1,4 @@
-import { CGFscene } from '../lib/CGF.js';
+import { CGFappearance, CGFscene } from '../lib/CGF.js';
 import { CGFaxis,CGFcamera } from '../lib/CGF.js';
 
 
@@ -85,6 +85,7 @@ export class XMLscene extends CGFscene {
         }
     }
 
+
     setDefaultAppearance() {
         this.setAmbient(0.2, 0.4, 0.8, 1.0);
         this.setDiffuse(0.2, 0.4, 0.8, 1.0);
@@ -105,6 +106,7 @@ export class XMLscene extends CGFscene {
 
         this.sceneInited = true;
     }
+
 
     /**
      * Displays the scene.
@@ -138,7 +140,7 @@ export class XMLscene extends CGFscene {
             // Displays the scene (MySceneGraph function).
             const idRoot = this.graph.idRoot
             const root = this.graph.components[idRoot];
-            this.drawComponent(root)
+            this.drawComponent(root, null)
         }
 
         this.popMatrix();
@@ -150,7 +152,7 @@ export class XMLscene extends CGFscene {
      * draws its children
      * @param {object} component 
      */
-    drawComponent(component){
+    drawComponent(component, previousApp){
 
         if (component.transformation != undefined) 
             this.multMatrix(component.transformation)

@@ -1,4 +1,4 @@
-import { CGFXMLreader } from "../lib/CGF.js";
+import { CGFappearance, CGFXMLreader } from "../lib/CGF.js";
 import { MyCylinder } from "./MyCylinder.js";
 import { MyRectangle } from "./MyRectangle.js";
 import { MyTriangle } from "./MyTriangle.js";
@@ -408,6 +408,7 @@ export class MySceneGraph {
     var children = materialsNode.children;
     const materialProperties = ["emission", "diffuse", "ambient", "specular"]
     this.materials = [];
+    this.appearences = [];
 
     var grandChildren = [];
     var nodeNames = [];
@@ -434,6 +435,8 @@ export class MySceneGraph {
       if(shininess == null) return "Material shininess value: " + shininess + "not valid"
       
       this.materials[materialID]={}
+      this.appearences[materialID]={}
+
       this.materials[materialID].shininess = shininess;
       grandChildren = children[i].children;
 
@@ -450,6 +453,18 @@ export class MySceneGraph {
         this.materials[materialID][node] = color;
         
       }
+      const material = this.materials[materialID]
+
+      //Create appearance
+      let appearence = new CGFappearance(this.scene)
+      appearence.setShininess(material.shininess)
+      appearence.setAmbient(material.ambient[0],material.ambient[1],material.ambient[2],material.ambient[3])
+      appearence.setDiffuse(material.diffuse[0],material.diffuse[1],material.diffuse[2],material.diffuse[3])
+      appearence.setSpecular(material.specular[0],material.specular[1],material.specular[2],material.specular[3])
+      appearence.setEmission(material.emission[0],material.emission[1],material.emission[2],material.emission[3])
+      
+      this.appearences[materialID] = appearence;
+      console.log(this.appearences)
     }
 
     //this.log("Parsed materials");
@@ -868,6 +883,26 @@ export class MySceneGraph {
 
       // Materials
       grandgrandChildren = []
+      if(materialsIndex == null){
+        return ("There should be a 'materials' camp, and cannot be empty ")
+      }
+
+      this.components[componentID].materials = []
+
+      grandgrandChildren = grandChildren[materialsIndex].children;
+      for(let i = 0; i< grandgrandChildren.length; i++){
+        //If material id is 'inherit', he keeps his fathers material
+        const materialNode = grandgrandChildren[i]
+        if(materialNode.nodeName != "material") {return "There should only be 'material' elements here. The element received is: " + materialNode.nodeName}
+
+        const materialID = this.reader.getString(materialNode, "id");
+        if(materialID != "inherit" && !this.materials.hasOwnProperty(materialID)){
+          return "There is no material defined with ID: " + materialID;
+        }
+
+        this.components[componentID].materials.push(materialID)
+      }
+
 
       // Texture
 
@@ -885,6 +920,8 @@ export class MySceneGraph {
       this.components[componentID].primitives = childrenComponents.primitives;
 
     }
+
+    console.log(this.components)
 
   }
 
