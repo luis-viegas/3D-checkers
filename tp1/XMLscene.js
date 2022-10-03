@@ -38,13 +38,15 @@ export class XMLscene extends CGFscene {
 
         this.axis = new CGFaxis(this);
         this.setUpdatePeriod(100);
+        //This vairable allows to change between materials pressing the button m/M
+        this.currentMaterial = 1;
     }
 
     /**
      * Initializes the scene cameras.
      */
     initCameras() {
-        this.camera = new CGFcamera(0.4, 0.1, 500, vec3.fromValues(50, 100, 15), vec3.fromValues(0, 0, 0));
+        this.camera = new CGFcamera(0.4, 0.1, 500, vec3.fromValues(50, 100, 20), vec3.fromValues(0, 0, 0));
     }
     /**
      * Initializes the scene lights with the values read from the XML file.
@@ -107,6 +109,11 @@ export class XMLscene extends CGFscene {
         this.sceneInited = true;
     }
 
+    //Handler of m key press
+    changeMaterialId(){
+        this.currentMaterial++
+    }
+
 
     /**
      * Displays the scene.
@@ -152,19 +159,25 @@ export class XMLscene extends CGFscene {
      * draws its children
      * @param {object} component 
      */
-    drawComponent(component, previousApp){
+    drawComponent(component, previousAppId){
 
         if (component.transformation != undefined) 
             this.multMatrix(component.transformation)
+
+        const currentComponentId = this.currentMaterial % component.materials.length
+        console.log(component,currentComponentId ,component.materials[currentComponentId])
+        let id = (component.materials[currentComponentId] !== "inherit" ? component.materials[currentComponentId] : previousAppId)
         
         for(let i = 0; i< component.children.length; i++){
             this.pushMatrix();
 
-            this.drawComponent(component.children[i])
+            this.drawComponent(component.children[i], id)
 
             this.popMatrix()
 
         }
+        let currentApperence = this.graph.appearences[id]
+        currentApperence.apply()
 
 
         for(let j= 0; j< component.primitives.length; j++){

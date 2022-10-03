@@ -37,9 +37,14 @@ export class MyInterface extends CGFinterface {
         this.scene.gui=this;
         this.processKeyboard=function(){};
         this.activeKeys={};
+
     }
 
+
     processKeyDown(event) {
+        if(event.key == 'm'){
+            this.scene.changeMaterialId()
+        } 
         this.activeKeys[event.code]=true;
     };
 

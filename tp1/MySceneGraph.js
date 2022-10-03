@@ -882,6 +882,7 @@ export class MySceneGraph {
       }
 
       // Materials
+      // Stores materials ID's as an array
       grandgrandChildren = []
       if(materialsIndex == null){
         return ("There should be a 'materials' camp, and cannot be empty ")

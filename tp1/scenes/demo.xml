@@ -33,6 +33,12 @@
             <diffuse r="0.6" g="0.0" b="0.0" a="1.0" />
             <specular r="0.6" g="0.0" b="0.0" a="1.0" />
         </material>
+        <material id="demoMaterial2" shininess="10">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="0.0" g="1.0" b="0.0" a="1.0" />
+            <diffuse r="0.0" g="0.6" b="0.0" a="1.0" />
+            <specular r="0.0" g="0.6" b="0.0" a="1.0" />
+        </material>
     </materials>
 
     <transformations>
@@ -62,10 +68,16 @@
             <sphere  radius="2.35" slices="20" stacks="20"/>
         </primitive>
         <primitive id="sphere2"> 
-            <sphere  radius="1.5" slices="20" stacks="20"/>
+            <sphere  radius="2.3" slices="20" stacks="20"/>
         </primitive>
         <primitive id="demoTorus">
             <torus inner="0.25" outer="2.5" slices="50" loops="50"/> 
+        </primitive>
+        <primitive id="cherryBall">
+            <sphere  radius="0.75" slices="20" stacks="20"/>
+        </primitive>
+        <primitive id="cherryStick">
+            <cylinder base="0.1" top="0.05" height="2.5" slices="40" stacks="60"/>
         </primitive>
         
     </primitives>
@@ -99,7 +111,7 @@
         </component>
         <component id="iceBall2">
             <transformation>
-                <translate x="0" y="12.5" z="0"/>
+                <translate x="0" y="13" z="0"/>
             </transformation>
             <materials>
                 <material id="demoMaterial" />
@@ -109,11 +121,39 @@
                 <primitiveref id="sphere2"/>
             </children>
         </component>
+        <component id="cherryStick">
+            <transformation>
+                <translate x='0' y='0.5' z='0'/>
+                <rotate axis='z' angle='-30'/>
+                <rotate axis='x' angle='-90'/>
+            </transformation>
+            <materials>
+                <material id="demoMaterial" />
+            </materials>
+            <texture id="demoTexture"/>
+            <children>
+                <primitiveref id="cherryStick"/>
+            </children>
+        </component>
+        <component id="cherry">
+            <transformation>
+                <translate x="0" y="15.5" z="0"/>
+            </transformation>
+            <materials>
+                <material id="demoMaterial" />
+            </materials>
+            <texture id="demoTexture"/>
+            <children>
+                <primitiveref id="cherryBall"/>
+                <componentref id="cherryStick"/>
+            </children>
+        </component>
         <component id="demoRoot">
             <transformation>
             </transformation>
             <materials>
                 <material id="demoMaterial" />
+                <material id="demoMaterial2" />
             </materials>
             <texture id="demoTexture"/>
             <children>
@@ -121,6 +161,7 @@
                 <primitiveref id="demoTriangle"/>
                 <componentref id="ground"/>
                 <componentref id="iceBall2"/>
+                <componentref id="cherry"/>
             </children>
         </component>
     </components>
