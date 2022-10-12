@@ -90,7 +90,7 @@
             <materials>
                 <material id="inherit"/>
             </materials>
-            <texture id="demoTexture"/>
+            <texture id="none"/>
             <children>
                 <primitiveref id="demoTorus" />
                 <primitiveref id="demoSphere" />
@@ -142,7 +142,7 @@
             <materials>
                 <material id="demoMaterial" />
             </materials>
-            <texture id="demoTexture"/>
+            <texture id="none"/>
             <children>
                 <primitiveref id="cherryBall"/>
                 <componentref id="cherryStick"/>

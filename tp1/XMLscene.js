@@ -147,7 +147,7 @@ export class XMLscene extends CGFscene {
             // Displays the scene (MySceneGraph function).
             const idRoot = this.graph.idRoot
             const root = this.graph.components[idRoot];
-            this.drawComponent(root, null)
+            this.drawComponent(root, null, null)
         }
 
         this.popMatrix();
@@ -159,24 +159,42 @@ export class XMLscene extends CGFscene {
      * draws its children
      * @param {object} component 
      */
-    drawComponent(component, previousAppId){
+    drawComponent(component, previousAppId, previousTexId){
 
         if (component.transformation != undefined) 
             this.multMatrix(component.transformation)
 
         const currentComponentId = this.currentMaterial % component.materials.length
-        console.log(component,currentComponentId ,component.materials[currentComponentId])
-        let id = (component.materials[currentComponentId] !== "inherit" ? component.materials[currentComponentId] : previousAppId)
-        
+        //console.log(component,currentComponentId ,component.materials[currentComponentId])
+
+        const appearenceId = (component.materials[currentComponentId] !== "inherit" ? component.materials[currentComponentId] : previousAppId)
+        let textureId
+
+        switch (component.texture.id){
+            case "inherit":
+                textureId = previousTexId
+                break;
+            case "none":
+                textureId = null
+                break;
+            default:
+                textureId = component.texture.id
+                break;
+        }
+
         for(let i = 0; i< component.children.length; i++){
             this.pushMatrix();
 
-            this.drawComponent(component.children[i], id)
+            this.drawComponent(component.children[i], appearenceId, textureId)
 
             this.popMatrix()
 
         }
-        let currentApperence = this.graph.appearences[id]
+
+        let currTexture = (textureId === null ? null : this.graph.textures[textureId])
+        let currentApperence = this.graph.appearences[appearenceId]
+
+        currentApperence.setTexture(currTexture)
         currentApperence.apply()
 
 

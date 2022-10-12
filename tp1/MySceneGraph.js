@@ -1,9 +1,10 @@
-import { CGFappearance, CGFXMLreader } from "../lib/CGF.js";
+import { CGFappearance, CGFXMLreader,CGFtexture } from "../lib/CGF.js";
 import { MyCylinder } from "./MyCylinder.js";
 import { MyRectangle } from "./MyRectangle.js";
 import { MyTriangle } from "./MyTriangle.js";
 import { MySphere } from "./MySphere.js";
 import { MyTorus } from "./MyTorus.js";
+
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -396,7 +397,55 @@ export class MySceneGraph {
   parseTextures(texturesNode) {
     //TODO texture parsing
     //For each texture in textures block, check ID and file URL
-    this.onXMLMinorError("To do: Parse textures.");
+    //Store texture info in array
+    //Check for repeated IDs
+
+    this.textures = [];
+
+    let children = texturesNode.children;
+    if(children.length == 0){
+      this.onXMLMinorError("No textures defined");
+      return null;
+    }
+
+    for(let i = 0; i < children.length; i++){
+      if(children[i].nodeName != "texture"){
+        this.onXMLMinorError("Unknown tag <" + children[i].nodeName + ">");
+        continue;
+      }
+
+      let id = this.reader.getString(children[i], "id");
+      if(id == null){
+        return "no ID defined for texture";
+      }
+      //Check for repeated IDs
+      if(this.textures[id] != null){
+        return "ID must be unique for each texture (conflict: ID = " + id + ")";
+      }
+
+      let file = this.reader.getString(children[i], "file");
+      if(file == null){
+        return "no file defined for texture";
+      }
+      //Check if file path is valid
+      if(!file.includes(".png") && !file.includes(".jpg")){
+        return "invalid file path for texture";
+      }
+      //Check if file path exists
+
+      let img = new Image();
+      img.src = file;
+      if (img.height != 0)
+        return "file path does not exist for texture";
+      
+
+      let new_texture = new CGFtexture(this.scene, file);
+      this.textures[id] = new_texture;
+      console.log(this.textures)
+
+    }
+    
+    this.log("Parsed textures");
     return null;
   }
 
@@ -906,6 +955,25 @@ export class MySceneGraph {
 
 
       // Texture
+      if(textureIndex == null){
+        return ("There should be a 'texture' camp, and cannot be empty ")
+      }
+      const textureNode = children[i].children[textureIndex];
+      const textureID = this.reader.getString(textureNode, "id");
+      let textureLength_s = null
+      let textureLength_t = null
+      if(textureID != "none" && textureID != "inherit") {
+        textureLength_s = this.reader.getFloat(textureNode, "length_s");
+        textureLength_s == null ? textureLength_s = 1 : textureLength_s = textureLength_s;
+        textureLength_t = this.reader.getFloat(textureNode, "length_t");
+        textureLength_t == null ? textureLength_t = 1 : textureLength_t = textureLength_t;
+      }
+      
+      this.components[componentID].texture = {
+        'id' : textureID,
+        'length_s' : textureLength_s,
+        'length_t' : textureLength_t,
+      }
 
       // Children
       grandgrandChildren = []
