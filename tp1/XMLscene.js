@@ -27,8 +27,6 @@ export class XMLscene extends CGFscene {
 
         this.sceneInited = false;
 
-        this.initCameras();
-
         this.enableTextures(true);
 
         this.gl.clearDepth(100.0);
@@ -46,7 +44,9 @@ export class XMLscene extends CGFscene {
      * Initializes the scene cameras.
      */
     initCameras() {
-        this.camera = new CGFcamera(0.4, 0.1, 500, vec3.fromValues(50, 100, 20), vec3.fromValues(0, 0, 0));
+        this.camera = this.graph.views[this.graph.default_view];
+        this.interface.setActiveCamera(this.camera);
+
     }
     /**
      * Initializes the scene lights with the values read from the XML file.
@@ -105,6 +105,8 @@ export class XMLscene extends CGFscene {
         this.setGlobalAmbientLight(this.graph.ambient[0], this.graph.ambient[1], this.graph.ambient[2], this.graph.ambient[3]);
 
         this.initLights();
+
+        this.initCameras();
 
         this.sceneInited = true;
     }

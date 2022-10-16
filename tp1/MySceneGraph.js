@@ -1,4 +1,4 @@
-import { CGFappearance, CGFXMLreader,CGFtexture } from "../lib/CGF.js";
+import { CGFappearance, CGFXMLreader,CGFtexture, CGFcamera, CGFcameraOrtho } from "../lib/CGF.js";
 import { MyCylinder } from "./MyCylinder.js";
 import { MyRectangle } from "./MyRectangle.js";
 import { MyTriangle } from "./MyTriangle.js";
@@ -226,7 +226,91 @@ export class MySceneGraph {
    * @param {view block element} viewsNode
    */
   parseView(viewsNode) {
-    this.onXMLMinorError("To do: Parse views and create cameras.");
+    const children = viewsNode.children;
+
+    if(children.length == 0) return "no views defined";
+
+    //This views will have all the cameras, ortho or not
+    this.views = [];
+
+    const default_view = this.reader.getString(viewsNode, "default");
+    if(default_view == null) return "no default view defined";
+
+    this.default_view = default_view;
+
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      const grandChildren = child.children;
+
+      if (child.nodeName != "perspective" && child.nodeName != "ortho")
+        this.onXMLMinorError("unknown tag <" + child.nodeName + ">");
+      else {
+        //Get id and proprieties bot view types have of the current view.
+        const view_type = child.nodeName;
+        const view_id = this.reader.getString(child, "id");        
+        if (view_id == null) return "no ID defined for view";
+        const view_near = this.reader.getFloat(child, "near");
+        if (view_near == null) return "no near defined for view";
+        const view_far = this.reader.getFloat(child, "far");
+        if (view_far == null) return "no far defined for view";
+
+        const from = grandChildren[0];
+        const to = grandChildren[1];
+
+        if(from.nodeName != "from") return "view must have a from tag";
+        if(to.nodeName != "to") return "view must have a to tag";
+
+        //Read 3d coords from and to
+        const from_coords = this.parseCoordinates3D(from, "from");
+        if (!Array.isArray(from_coords)) return from_coords;
+        const to_coords = this.parseCoordinates3D(to, "to");
+        if (!Array.isArray(to_coords)) return to_coords;
+
+        switch (view_type) {
+          case "perspective":
+            const view_angle = this.reader.getFloat(child, "angle");
+            if (view_angle == null) return "no angle defined for view";
+            
+            if(grandChildren.length != 2) return "perspective view must have 2 grand children";
+            //Create perspective camera
+            const perspective_camera = new CGFcamera(DEGREE_TO_RAD * view_angle, view_near, view_far, vec3.fromValues(...from_coords), vec3.fromValues(...to_coords));
+            this.views[view_id] = perspective_camera;
+
+            break;
+          case "ortho":
+            const view_left = this.reader.getFloat(child, "left");
+            if (view_left == null) return "no left defined for view";
+            const view_right = this.reader.getFloat(child, "right");
+            if (view_right == null) return "no right defined for view";
+            const view_top = this.reader.getFloat(child, "top");
+            if (view_top == null) return "no top defined for view";
+            const view_bottom = this.reader.getFloat(child, "bottom");
+            if (view_bottom == null) return "no bottom defined for view";
+
+            if(grandChildren.length != 2 && grandChildren.length != 3 ) return "ortho view must have 2/3 grand children";
+            let up;
+            if(grandChildren.length == 3){
+              up = grandChildren[2];
+              if(up.nodeName != "up") return "view must have a up tag";
+              const up_coords = this.parseCoordinates3D(up, "up");
+              if (!Array.isArray(up_coords)) return up_coords;
+              //Create ortho camera
+            } else {
+              up = [0,1,0];
+            }
+            const ortho_camera = new CGFcameraOrtho(view_left, view_right, view_bottom, view_top, view_near, view_far, vec3.fromValues(...from_coords), vec3.fromValues(...to_coords), vec3.fromValues(...up_coords));
+            this.views[view_id] = ortho_camera;
+
+            break;
+        } 
+      }
+    }
+
+    if(this.views[this.default_view] == null) return "default view not created";
+
+    this.log("Parsed views");
+    console.log(this.views);
+    console.log(this.default_view)
 
     return null;
   }
@@ -395,7 +479,6 @@ export class MySceneGraph {
    * @param {textures block element} texturesNode
    */
   parseTextures(texturesNode) {
-    //TODO texture parsing
     //For each texture in textures block, check ID and file URL
     //Store texture info in array
     //Check for repeated IDs
