@@ -32,6 +32,9 @@ export class MyCylinder extends CGFobject {
     const radiusStep = (this.top - this.base)/ this.stacks;
     const heightStep = this.height/this.stacks;
 
+    const textHeightStep = 1/this.stacks;
+    const textRadiusStep = 1/this.slices;
+
     let vertex = 0;
     let xCoord = 0.0;
     let tempZ = 0;
@@ -40,7 +43,9 @@ export class MyCylinder extends CGFobject {
     let angleIncrement = (Math.PI * 2) / this.slices;
     let counter = 0;
 
-    //
+    let textXCoord = 0.0;
+    let textYCoord = 0.0;
+
     for(let step = 0; step <this.stacks; step++){
 
         for (let div = 0; div <= this.slices; div++) {
@@ -48,8 +53,8 @@ export class MyCylinder extends CGFobject {
             this.vertices.push(tempRadius*Math.sin(angle),tempRadius*Math.cos(angle), tempZ);
             this.vertices.push((tempRadius + radiusStep)*Math.sin(angle),(tempRadius+radiusStep)*Math.cos(angle), tempZ + heightStep);
 
-            this.texCoords.push(xCoord, 1);
-            this.texCoords.push(xCoord, 0);
+            this.texCoords.push(textXCoord, textYCoord );
+            this.texCoords.push(textXCoord, textYCoord + textHeightStep);
 
             if (div < this.slices) {
                 this.indices.push( vertex, vertex + 1, vertex + 2);
@@ -60,16 +65,25 @@ export class MyCylinder extends CGFobject {
             
             //TODO Textures
             //Normais com o método de Smooth Shading de Gouraud
-            this.normals.push(tempRadius*Math.sin(angle) + (tempRadius + radiusStep)*Math.sin(angle),tempRadius*Math.cos(angle) + (tempRadius+radiusStep)*Math.cos(angle) , tempZ +tempZ + heightStep);
-            this.normals.push(tempRadius*Math.sin(angle) + (tempRadius + radiusStep)*Math.sin(angle),tempRadius*Math.cos(angle) + (tempRadius+radiusStep)*Math.cos(angle) , tempZ +tempZ + heightStep);
+            let normal = [tempRadius*Math.sin(angle) + (tempRadius + radiusStep)*Math.sin(angle),tempRadius*Math.cos(angle) + (tempRadius+radiusStep)*Math.cos(angle) , tempZ +tempZ + heightStep]
+            let normalLength = Math.sqrt(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[2]);
+            //Normalize the normal
+            normal[0] = normal[0]/normalLength;
+            normal[1] = normal[1]/normalLength;
+            normal[2] = normal[2]/normalLength;
+
+            this.normals.push(normal[0],normal[1],normal[2]);
+            this.normals.push(normal[0],normal[1],normal[2]);
             
 
             angle += angleIncrement;
-            xCoord += angleIncrement/(2*Math.PI);
+            textXCoord += textRadiusStep;
         }
 
         tempZ += heightStep
         tempRadius += radiusStep
+        textXCoord = 0.0;
+        textYCoord += textHeightStep;
         angle = 0
         vertex+=2;
         

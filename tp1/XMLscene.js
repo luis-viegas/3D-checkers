@@ -1,4 +1,4 @@
-import { CGFappearance, CGFscene } from '../lib/CGF.js';
+import { CGFappearance, CGFlight, CGFscene } from '../lib/CGF.js';
 import { CGFaxis,CGFcamera } from '../lib/CGF.js';
 
 
@@ -36,8 +36,11 @@ export class XMLscene extends CGFscene {
 
         this.axis = new CGFaxis(this);
         this.setUpdatePeriod(100);
-        //This vairable allows to change between materials pressing the button m/M
+        //This variable allows to change between materials pressing the button m/M
         this.currentMaterial = 1;
+
+        // this variable allows to display the axis (it starts disabled)
+        this.displayAxis = false;
     }
 
     /**
@@ -54,15 +57,16 @@ export class XMLscene extends CGFscene {
     initLights() {
         var i = 0;
         // Lights index.
-
         // Reads the lights from the scene graph.
         for (var key in this.graph.lights) {
             if (i >= 8)
                 break;              // Only eight lights allowed by WebGL.
+            
 
             if (this.graph.lights.hasOwnProperty(key)) {
                 var light = this.graph.lights[key];
 
+                this.lights[i].name = key
                 this.lights[i].setPosition(light[2][0], light[2][1], light[2][2], light[2][3]);
                 this.lights[i].setAmbient(light[3][0], light[3][1], light[3][2], light[3][3]);
                 this.lights[i].setDiffuse(light[4][0], light[4][1], light[4][2], light[4][3]);
@@ -74,6 +78,7 @@ export class XMLscene extends CGFscene {
                     this.lights[i].setSpotDirection(light[8][0], light[8][1], light[8][2]);
                 }
 
+                
                 this.lights[i].setVisible(true);
                 if (light[0])
                     this.lights[i].enable();
@@ -84,16 +89,15 @@ export class XMLscene extends CGFscene {
 
                 i++;
             }
+
         }
+
+        console.log(this.lights)
+
     }
 
 
-    setDefaultAppearance() {
-        this.setAmbient(0.2, 0.4, 0.8, 1.0);
-        this.setDiffuse(0.2, 0.4, 0.8, 1.0);
-        this.setSpecular(0.2, 0.4, 0.8, 1.0);
-        this.setShininess(10.0);
-    }
+
     /** Handler called when the graph is finally loaded. 
      * As loading is asynchronous, this may be called already after the application has started the run loop
      */
@@ -108,12 +112,24 @@ export class XMLscene extends CGFscene {
 
         this.initCameras();
 
+        this.interface.lightsConfig()
+
         this.sceneInited = true;
     }
 
     //Handler of m key press
     changeMaterialId(){
         this.currentMaterial++
+    }
+
+    updateAxis(){
+        console.log("Axis updated")
+    }   
+
+    updateLights(id){
+
+        this.lights[id].update();
+        console.log("Lights updated")
     }
 
 
@@ -134,17 +150,13 @@ export class XMLscene extends CGFscene {
         // Apply transformations corresponding to the camera position relative to the origin
         this.applyViewMatrix();
 
-        this.pushMatrix();
-        this.axis.display();
-
-        for (var i = 0; i < this.lights.length; i++) {
-            this.lights[i].setVisible(true);
-            this.lights[i].enable();
-        }
+        this.pushMatrix();      
 
         if (this.sceneInited) {
             // Draw axis
-            this.setDefaultAppearance();
+            if(this.displayAxis){
+                this.axis.display();
+            }
 
             // Displays the scene (MySceneGraph function).
             const idRoot = this.graph.idRoot

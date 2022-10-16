@@ -395,7 +395,7 @@ export class MySceneGraph {
             "; assuming 'value = 1'"
         );
 
-      enableLight = aux || 1;
+      enableLight = aux;
 
       //Add enabled boolean and type name to light info
       global.push(enableLight);
@@ -471,6 +471,7 @@ export class MySceneGraph {
       );
 
     this.log("Parsed lights");
+    console.log(this.lights);
     return null;
   }
 
@@ -1259,7 +1260,6 @@ export class MySceneGraph {
    * @param {block of elements} children 
    */
   parseComponentsChildren(children){
-    //TODO tweak this to spearate child components and primitives because of materials
     if(children.length == 0){ return "There should be at least one component or a primitive"}
     let componentChildren = [];
     let primitives = [];
@@ -1317,13 +1317,6 @@ export class MySceneGraph {
     console.log("   " + message);
   }
 
-  /**
-   * Displays the scene, processing each node, starting in the root node.
-   */
-  displayScene() {
-    //TODO: Create display loop for transversing the scene graph
 
-    //To test the parsing/creation of the primitives, call the display function directly
-    this.primitives["demoRectangle"].display();
-  }
+
 }

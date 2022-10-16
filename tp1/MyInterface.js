@@ -23,10 +23,13 @@ export class MyInterface extends CGFinterface {
 
         this.gui = new dat.GUI();
 
-        // add a group of controls (and open/expand by defult)
+        // add a group of controls (and open/expand by default)
 
         this.initKeys();
 
+        this.generalConfig()
+
+        
         return true;
     }
 
@@ -55,4 +58,34 @@ export class MyInterface extends CGFinterface {
     isKeyPressed(keyCode) {
         return this.activeKeys[keyCode] || false;
     }
+
+    /**
+     * Adds a folder containing general configs
+     */
+    generalConfig(){
+        let folder = this.gui.addFolder("General Configs");
+        
+        folder.add(this.scene, 'displayAxis')
+            .name("Display Axis")
+                .onChange(this.scene.updateAxis.bind(this.scene));
+    }
+
+    /**
+     * Adds a folder containing the lights configs
+     * 
+     */
+    lightsConfig(){
+
+        let folder = this.gui.addFolder("Lights Configs");
+        for(let i = 0; i < this.scene.lights.length; i++){
+            if(  this.scene.lights[i].hasOwnProperty('name')){
+            folder.add(this.scene.lights[i], 'enabled')
+                .name("Light " + this.scene.lights[i].name)
+                    .onChange(this.scene.updateLights.bind(this.scene, i));
+            }    
+
+        }
+        
+    }
+
 }
