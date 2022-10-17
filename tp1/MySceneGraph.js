@@ -1,10 +1,15 @@
-import { CGFappearance, CGFXMLreader,CGFtexture, CGFcamera, CGFcameraOrtho } from "../lib/CGF.js";
+import {
+  CGFappearance,
+  CGFXMLreader,
+  CGFtexture,
+  CGFcamera,
+  CGFcameraOrtho,
+} from "../lib/CGF.js";
 import { MyCylinder } from "./MyCylinder.js";
 import { MyRectangle } from "./MyRectangle.js";
 import { MyTriangle } from "./MyTriangle.js";
 import { MySphere } from "./MySphere.js";
 import { MyTorus } from "./MyTorus.js";
-
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -228,15 +233,19 @@ export class MySceneGraph {
   parseView(viewsNode) {
     const children = viewsNode.children;
 
-    if(children.length == 0) return "no views defined";
+    if (children.length == 0) return "no views defined";
 
     //This views will have all the cameras, ortho or not
     this.views = [];
 
+    this.scene.cameraIDs = [];
+
     const default_view = this.reader.getString(viewsNode, "default");
-    if(default_view == null) return "no default view defined";
+    if (default_view == null) return "no default view defined";
 
     this.default_view = default_view;
+
+    this.scene.selectedView = default_view;
 
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
@@ -247,7 +256,7 @@ export class MySceneGraph {
       else {
         //Get id and proprieties bot view types have of the current view.
         const view_type = child.nodeName;
-        const view_id = this.reader.getString(child, "id");        
+        const view_id = this.reader.getString(child, "id");
         if (view_id == null) return "no ID defined for view";
         const view_near = this.reader.getFloat(child, "near");
         if (view_near == null) return "no near defined for view";
@@ -257,8 +266,8 @@ export class MySceneGraph {
         const from = grandChildren[0];
         const to = grandChildren[1];
 
-        if(from.nodeName != "from") return "view must have a from tag";
-        if(to.nodeName != "to") return "view must have a to tag";
+        if (from.nodeName != "from") return "view must have a from tag";
+        if (to.nodeName != "to") return "view must have a to tag";
 
         //Read 3d coords from and to
         const from_coords = this.parseCoordinates3D(from, "from");
@@ -266,14 +275,23 @@ export class MySceneGraph {
         const to_coords = this.parseCoordinates3D(to, "to");
         if (!Array.isArray(to_coords)) return to_coords;
 
+        this.scene.cameraIDs.push(view_id);
+
         switch (view_type) {
           case "perspective":
             const view_angle = this.reader.getFloat(child, "angle");
             if (view_angle == null) return "no angle defined for view";
-            
-            if(grandChildren.length != 2) return "perspective view must have 2 grand children";
+
+            if (grandChildren.length != 2)
+              return "perspective view must have 2 grand children";
             //Create perspective camera
-            const perspective_camera = new CGFcamera(DEGREE_TO_RAD * view_angle, view_near, view_far, vec3.fromValues(...from_coords), vec3.fromValues(...to_coords));
+            const perspective_camera = new CGFcamera(
+              DEGREE_TO_RAD * view_angle,
+              view_near,
+              view_far,
+              vec3.fromValues(...from_coords),
+              vec3.fromValues(...to_coords)
+            );
             this.views[view_id] = perspective_camera;
 
             break;
@@ -287,30 +305,42 @@ export class MySceneGraph {
             const view_bottom = this.reader.getFloat(child, "bottom");
             if (view_bottom == null) return "no bottom defined for view";
 
-            if(grandChildren.length != 2 && grandChildren.length != 3 ) return "ortho view must have 2/3 grand children";
+            if (grandChildren.length != 2 && grandChildren.length != 3)
+              return "ortho view must have 2/3 grand children";
             let up;
-            if(grandChildren.length == 3){
+            if (grandChildren.length == 3) {
               up = grandChildren[2];
-              if(up.nodeName != "up") return "view must have a up tag";
+              if (up.nodeName != "up") return "view must have a up tag";
               const up_coords = this.parseCoordinates3D(up, "up");
               if (!Array.isArray(up_coords)) return up_coords;
               //Create ortho camera
             } else {
-              up = [0,1,0];
+              up = [0, 1, 0];
             }
-            const ortho_camera = new CGFcameraOrtho(view_left, view_right, view_bottom, view_top, view_near, view_far, vec3.fromValues(...from_coords), vec3.fromValues(...to_coords), vec3.fromValues(...up_coords));
+            const ortho_camera = new CGFcameraOrtho(
+              view_left,
+              view_right,
+              view_bottom,
+              view_top,
+              view_near,
+              view_far,
+              vec3.fromValues(...from_coords),
+              vec3.fromValues(...to_coords),
+              vec3.fromValues(...up_coords)
+            );
             this.views[view_id] = ortho_camera;
 
             break;
-        } 
+        }
       }
     }
 
-    if(this.views[this.default_view] == null) return "default view not created";
+    if (this.views[this.default_view] == null)
+      return "default view not created";
 
     this.log("Parsed views");
     console.log(this.views);
-    console.log(this.default_view)
+    console.log(this.default_view);
 
     return null;
   }
@@ -487,48 +517,45 @@ export class MySceneGraph {
     this.textures = [];
 
     let children = texturesNode.children;
-    if(children.length == 0){
+    if (children.length == 0) {
       this.onXMLMinorError("No textures defined");
       return null;
     }
 
-    for(let i = 0; i < children.length; i++){
-      if(children[i].nodeName != "texture"){
+    for (let i = 0; i < children.length; i++) {
+      if (children[i].nodeName != "texture") {
         this.onXMLMinorError("Unknown tag <" + children[i].nodeName + ">");
         continue;
       }
 
       let id = this.reader.getString(children[i], "id");
-      if(id == null){
+      if (id == null) {
         return "no ID defined for texture";
       }
       //Check for repeated IDs
-      if(this.textures[id] != null){
+      if (this.textures[id] != null) {
         return "ID must be unique for each texture (conflict: ID = " + id + ")";
       }
 
       let file = this.reader.getString(children[i], "file");
-      if(file == null){
+      if (file == null) {
         return "no file defined for texture";
       }
       //Check if file path is valid
-      if(!file.includes(".png") && !file.includes(".jpg")){
+      if (!file.includes(".png") && !file.includes(".jpg")) {
         return "invalid file path for texture";
       }
       //Check if file path exists
 
       let img = new Image();
       img.src = file;
-      if (img.height != 0)
-        return "file path does not exist for texture";
-      
+      if (img.height != 0) return "file path does not exist for texture";
 
       let new_texture = new CGFtexture(this.scene, file);
       this.textures[id] = new_texture;
-      console.log(this.textures)
-
+      console.log(this.textures);
     }
-    
+
     this.log("Parsed textures");
     return null;
   }
@@ -539,7 +566,7 @@ export class MySceneGraph {
    */
   parseMaterials(materialsNode) {
     var children = materialsNode.children;
-    const materialProperties = ["emission", "diffuse", "ambient", "specular"]
+    const materialProperties = ["emission", "diffuse", "ambient", "specular"];
     this.materials = [];
     this.appearences = [];
 
@@ -562,46 +589,69 @@ export class MySceneGraph {
         return (
           "ID must be unique for each light (conflict: ID = " + materialID + ")"
         );
-      
+
       //Get material shininess
       let shininess = this.reader.getFloat(children[i], "shininess");
-      if(shininess == null) return "Material shininess value: " + shininess + "not valid"
-      
-      this.materials[materialID]={}
-      this.appearences[materialID]={}
+      if (shininess == null)
+        return "Material shininess value: " + shininess + "not valid";
+
+      this.materials[materialID] = {};
+      this.appearences[materialID] = {};
 
       this.materials[materialID].shininess = shininess;
       grandChildren = children[i].children;
 
-      for(let j= 0; j< grandChildren.length; j++){
+      for (let j = 0; j < grandChildren.length; j++) {
         const node = grandChildren[j].nodeName;
-        this.log(node)
-        if(node in materialProperties)
-          return "Parameters for a material must be emission, diffuse, ambient or specular. Not: " + node;
-        
-        let color = this.parseColor(grandChildren[j], "node with ID: " + node)
+        this.log(node);
+        if (node in materialProperties)
+          return (
+            "Parameters for a material must be emission, diffuse, ambient or specular. Not: " +
+            node
+          );
 
-        if(typeof color == 'string') return color;
+        let color = this.parseColor(grandChildren[j], "node with ID: " + node);
+
+        if (typeof color == "string") return color;
 
         this.materials[materialID][node] = color;
-        
       }
-      const material = this.materials[materialID]
+      const material = this.materials[materialID];
 
       //Create appearance
-      let appearence = new CGFappearance(this.scene)
-      appearence.setShininess(material.shininess)
-      appearence.setAmbient(material.ambient[0],material.ambient[1],material.ambient[2],material.ambient[3])
-      appearence.setDiffuse(material.diffuse[0],material.diffuse[1],material.diffuse[2],material.diffuse[3])
-      appearence.setSpecular(material.specular[0],material.specular[1],material.specular[2],material.specular[3])
-      appearence.setEmission(material.emission[0],material.emission[1],material.emission[2],material.emission[3])
-      
+      let appearence = new CGFappearance(this.scene);
+      appearence.setShininess(material.shininess);
+      appearence.setAmbient(
+        material.ambient[0],
+        material.ambient[1],
+        material.ambient[2],
+        material.ambient[3]
+      );
+      appearence.setDiffuse(
+        material.diffuse[0],
+        material.diffuse[1],
+        material.diffuse[2],
+        material.diffuse[3]
+      );
+      appearence.setSpecular(
+        material.specular[0],
+        material.specular[1],
+        material.specular[2],
+        material.specular[3]
+      );
+      appearence.setEmission(
+        material.emission[0],
+        material.emission[1],
+        material.emission[2],
+        material.emission[3]
+      );
+
       this.appearences[materialID] = appearence;
-      console.log(this.appearences)
+      console.log(this.appearences);
     }
 
     //this.log("Parsed materials");
-    console.log(this.materials)
+    console.log(this.materials);
     return null;
   }
 
@@ -615,7 +665,6 @@ export class MySceneGraph {
     this.transformations = [];
 
     var grandChildren = [];
-    
 
     // Any number of transformations.
     for (var i = 0; i < children.length; i++) {
@@ -662,46 +711,42 @@ export class MySceneGraph {
               "scale transformation for ID " + transformationID
             );
             if (!Array.isArray(coordinates)) return coordinates;
-            transfMatrix = mat4.scale(
-              transfMatrix,
-              transfMatrix,
-              coordinates
-            );
+            transfMatrix = mat4.scale(transfMatrix, transfMatrix, coordinates);
             break;
           case "rotate":
             let axis = this.reader.getString(grandChildren[j], "axis");
-            if(axis != "x" && axis!= "y" && axis!="z"){
-              return ("Invalid axis received: " + axis );
+            if (axis != "x" && axis != "y" && axis != "z") {
+              return "Invalid axis received: " + axis;
             }
 
             let angle = this.reader.getFloat(grandChildren[j], "angle");
-            if(angle == null || isNaN(angle) ){
-              return ("Invalid angle received: " + angle );
+            if (angle == null || isNaN(angle)) {
+              return "Invalid angle received: " + angle;
             }
-            
-            let axisVector = []
-            switch (axis){
-              case 'x':
-                axisVector.push(...[1,0,0])
+
+            let axisVector = [];
+            switch (axis) {
+              case "x":
+                axisVector.push(...[1, 0, 0]);
                 break;
-              case 'y':
-                axisVector.push(...[0,1,0])
+              case "y":
+                axisVector.push(...[0, 1, 0]);
                 break;
-              case 'z':
-                axisVector.push(...[0,0,1])
+              case "z":
+                axisVector.push(...[0, 0, 1]);
                 break;
             }
 
             let angleRad = (angle * Math.PI) / 180.0;
-            console.log(angleRad)
+            console.log(angleRad);
             transfMatrix = mat4.rotate(
               transfMatrix,
               transfMatrix,
               angleRad,
               axisVector
-            )
-            
-            this.log("Parsed rotation of " + angle + " in axis " + axis)
+            );
+
+            this.log("Parsed rotation of " + angle + " in axis " + axis);
             break;
         }
       }
@@ -978,8 +1023,8 @@ export class MySceneGraph {
           componentID +
           ")"
         );
-      
-      this.components[componentID] = {}
+
+      this.components[componentID] = {};
       grandChildren = children[i].children;
 
       nodeNames = [];
@@ -993,92 +1038,105 @@ export class MySceneGraph {
       var childrenIndex = nodeNames.indexOf("children");
 
       // Transformations
-      if(transformationIndex == null){
-        return ("There should be a 'transformation' camp, even if empty")
+      if (transformationIndex == null) {
+        return "There should be a 'transformation' camp, even if empty";
       }
 
       grandgrandChildren = grandChildren[transformationIndex].children;
       //There are no transformations
-      if(grandgrandChildren.length == 0){
+      if (grandgrandChildren.length == 0) {
         this.log("Component " + componentID + " has no transformations");
-      }
-      else{
+      } else {
         //Verify if it a transformationref and there is no more than 1
-        if(grandgrandChildren[0].nodeName == "transformationref" && grandgrandChildren.length >1){
+        if (
+          grandgrandChildren[0].nodeName == "transformationref" &&
+          grandgrandChildren.length > 1
+        ) {
           return "There can only be one reference to a transformation";
-        } 
+        }
 
-        let transformationMatrix= this.parseComponentTransformation(grandgrandChildren)
-        if(typeof transformationMatrix == "string"){ return transformationMatrix}
+        let transformationMatrix =
+          this.parseComponentTransformation(grandgrandChildren);
+        if (typeof transformationMatrix == "string") {
+          return transformationMatrix;
+        }
         this.components[componentID].transformation = transformationMatrix;
-
       }
 
       // Materials
       // Stores materials ID's as an array
-      grandgrandChildren = []
-      if(materialsIndex == null){
-        return ("There should be a 'materials' camp, and cannot be empty ")
+      grandgrandChildren = [];
+      if (materialsIndex == null) {
+        return "There should be a 'materials' camp, and cannot be empty ";
       }
 
-      this.components[componentID].materials = []
+      this.components[componentID].materials = [];
 
       grandgrandChildren = grandChildren[materialsIndex].children;
-      for(let i = 0; i< grandgrandChildren.length; i++){
+      for (let i = 0; i < grandgrandChildren.length; i++) {
         //If material id is 'inherit', he keeps his fathers material
-        const materialNode = grandgrandChildren[i]
-        if(materialNode.nodeName != "material") {return "There should only be 'material' elements here. The element received is: " + materialNode.nodeName}
+        const materialNode = grandgrandChildren[i];
+        if (materialNode.nodeName != "material") {
+          return (
+            "There should only be 'material' elements here. The element received is: " +
+            materialNode.nodeName
+          );
+        }
 
         const materialID = this.reader.getString(materialNode, "id");
-        if(materialID != "inherit" && !this.materials.hasOwnProperty(materialID)){
+        if (
+          materialID != "inherit" &&
+          !this.materials.hasOwnProperty(materialID)
+        ) {
           return "There is no material defined with ID: " + materialID;
         }
 
-        this.components[componentID].materials.push(materialID)
+        this.components[componentID].materials.push(materialID);
       }
 
-
       // Texture
-      if(textureIndex == null){
-        return ("There should be a 'texture' camp, and cannot be empty ")
+      if (textureIndex == null) {
+        return "There should be a 'texture' camp, and cannot be empty ";
       }
       const textureNode = children[i].children[textureIndex];
       const textureID = this.reader.getString(textureNode, "id");
-      let textureLength_s = null
-      let textureLength_t = null
-      if(textureID != "none" && textureID != "inherit") {
+      let textureLength_s = null;
+      let textureLength_t = null;
+      if (textureID != "none" && textureID != "inherit") {
         textureLength_s = this.reader.getFloat(textureNode, "length_s");
-        textureLength_s == null ? textureLength_s = 1 : textureLength_s = textureLength_s;
+        textureLength_s == null
+          ? (textureLength_s = 1)
+          : (textureLength_s = textureLength_s);
         textureLength_t = this.reader.getFloat(textureNode, "length_t");
-        textureLength_t == null ? textureLength_t = 1 : textureLength_t = textureLength_t;
+        textureLength_t == null
+          ? (textureLength_t = 1)
+          : (textureLength_t = textureLength_t);
       }
-      
+
       this.components[componentID].texture = {
-        'id' : textureID,
-        'length_s' : textureLength_s,
-        'length_t' : textureLength_t,
-      }
+        id: textureID,
+        length_s: textureLength_s,
+        length_t: textureLength_t,
+      };
 
       // Children
-      grandgrandChildren = []
+      grandgrandChildren = [];
 
-      if(childrenIndex == null){
-        return ("There should be a 'children' camp, and cannot be empty")
+      if (childrenIndex == null) {
+        return "There should be a 'children' camp, and cannot be empty";
       }
       grandgrandChildren = grandChildren[childrenIndex].children;
       let childrenComponents = this.parseComponentsChildren(grandgrandChildren);
 
-      if(typeof childrenComponents == "string"){ return childrenComponents} //Means it is an error message
+      if (typeof childrenComponents == "string") {
+        return childrenComponents;
+      } //Means it is an error message
       this.components[componentID].children = childrenComponents.children;
       this.components[componentID].primitives = childrenComponents.primitives;
-
     }
 
-    console.log(this.components)
-
+    console.log(this.components);
   }
-
-  
 
   /**
    * Parse the coordinates from a node with ID = id
@@ -1167,19 +1225,24 @@ export class MySceneGraph {
   /**
    * Parse the transformations of a component
    * Returns the transformation matrix of a component or null if there is no transformation
-   * @param {block element} transformations 
+   * @param {block element} transformations
    */
-   parseComponentTransformation(transformationsComp){
-  
-    if(transformationsComp[0].nodeName == "transformationref"){
+  parseComponentTransformation(transformationsComp) {
+    if (transformationsComp[0].nodeName == "transformationref") {
       //Get transformation id and verify if it exists
-      let transformationId = this.reader.getString(transformationsComp[0], "id")
-      if(this.transformations[transformationId] == null){ return "Id " + transformationId +" does not reference any transformation"}
+      let transformationId = this.reader.getString(
+        transformationsComp[0],
+        "id"
+      );
+      if (this.transformations[transformationId] == null) {
+        return (
+          "Id " + transformationId + " does not reference any transformation"
+        );
+      }
 
       return this.transformations[transformationId];
-    }
-    else{
-      let transfMatrix = mat4.create()
+    } else {
+      let transfMatrix = mat4.create();
       //There are only normal transformations:
       for (var j = 0; j < transformationsComp.length; j++) {
         switch (transformationsComp[j].nodeName) {
@@ -1200,96 +1263,98 @@ export class MySceneGraph {
           case "scale":
             var coordinates = this.parseCoordinates3D(
               transformationsComp[j],
-              "scale transformation" 
+              "scale transformation"
             );
             if (!Array.isArray(coordinates)) return coordinates;
 
-            transfMatrix = mat4.scale(
-              transfMatrix,
-              transfMatrix,
-              coordinates
-            );
+            transfMatrix = mat4.scale(transfMatrix, transfMatrix, coordinates);
 
             break;
           case "rotate":
             let axis = this.reader.getString(transformationsComp[j], "axis");
-            if(axis != "x" && axis!= "y" && axis!="z"){
-              return ("Invalid axis received: " + axis );
+            if (axis != "x" && axis != "y" && axis != "z") {
+              return "Invalid axis received: " + axis;
             }
 
             let angle = this.reader.getFloat(transformationsComp[j], "angle");
-            if(angle == null || isNaN(angle) ){
-              return ("Invalid angle received: " + angle );
+            if (angle == null || isNaN(angle)) {
+              return "Invalid angle received: " + angle;
             }
 
-            
-            let axisVector = []
-            switch (axis){
-              case 'x':
-                axisVector.push(...[1,0,0])
+            let axisVector = [];
+            switch (axis) {
+              case "x":
+                axisVector.push(...[1, 0, 0]);
                 break;
-              case 'y':
-                axisVector.push(...[0,1,0])
+              case "y":
+                axisVector.push(...[0, 1, 0]);
                 break;
-              case 'z':
-                axisVector.push(...[0,0,1])
+              case "z":
+                axisVector.push(...[0, 0, 1]);
                 break;
             }
 
             let angleRad = (angle * Math.PI) / 180.0;
-            console.log(angleRad)
+            console.log(angleRad);
             transfMatrix = mat4.rotate(
               transfMatrix,
               transfMatrix,
               angleRad,
               axisVector
-            )
-            
-            this.log("Parsed rotation of " + angle + " in axis " + axis)
+            );
+
+            this.log("Parsed rotation of " + angle + " in axis " + axis);
             break;
         }
       }
       return transfMatrix;
-      
     }
   }
 
   /**
    * Parses the children components of a component
    * Returns the list of components or a string having an message error
-   * @param {block of elements} children 
+   * @param {block of elements} children
    */
-  parseComponentsChildren(children){
-    if(children.length == 0){ return "There should be at least one component or a primitive"}
+  parseComponentsChildren(children) {
+    if (children.length == 0) {
+      return "There should be at least one component or a primitive";
+    }
     let componentChildren = [];
     let primitives = [];
-    for(let i = 0; i < children.length; i++){
+    for (let i = 0; i < children.length; i++) {
       const child = children[i];
 
       switch (child.nodeName) {
         case "componentref":
-          const componentId = this.reader.getString(child, "id")
-          if(this.components[componentId] == null){return "There is no component named " + componentId}
-          componentChildren.push(this.components[componentId])
+          const componentId = this.reader.getString(child, "id");
+          if (this.components[componentId] == null) {
+            return "There is no component named " + componentId;
+          }
+          componentChildren.push(this.components[componentId]);
           break;
-        
-        case "primitiveref": 
-          const primitiveId = this.reader.getString(child, "id")
-          if(this.primitives[primitiveId] == null){return "There is no component named " + primitiveId}
-          primitives.push(this.primitives[primitiveId])
+
+        case "primitiveref":
+          const primitiveId = this.reader.getString(child, "id");
+          if (this.primitives[primitiveId] == null) {
+            return "There is no component named " + primitiveId;
+          }
+          primitives.push(this.primitives[primitiveId]);
           break;
 
         default:
-          return "Invalid block of information: " + child.nodeName + ". Should be 'componentref' of 'primitiveref'"
+          return (
+            "Invalid block of information: " +
+            child.nodeName +
+            ". Should be 'componentref' of 'primitiveref'"
+          );
       }
-
     }
 
     return {
-      'children' : componentChildren,
-      'primitives' : primitives
+      children: componentChildren,
+      primitives: primitives,
     };
-
   }
 
   /*
@@ -1316,7 +1381,4 @@ export class MySceneGraph {
   log(message) {
     console.log("   " + message);
   }
-
-
-
 }
