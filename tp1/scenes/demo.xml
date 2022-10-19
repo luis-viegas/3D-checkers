@@ -3,8 +3,8 @@
 
     <views default="defaultCamera">
         <perspective id="defaultCamera" near="0.1" far="500" angle="45">
-            <from x="30" y="15" z="30" />
-            <to x="0" y="-2" z="0" />
+            <from x="20" y="20" z="20" />
+            <to x="0" y="10" z="0" />
         </perspective>
         <perspective id="defaultCamera2" near="0.1" far="500" angle="45">
             <from x="-30" y="-15" z="-30" />
@@ -19,10 +19,10 @@
 
     <lights>
         <omni id="demoLight" enabled="1">
-            <location x="9.8" y="11.9" z="10" w="1.0" />
+            <location x="20.8" y="11.9" z="10" w="1.0" />
             <ambient r="0" g="0" b="0" a="1.0" />
             <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
-            <specular r="1.0" g="1.0" b="1.0" a="1.0" />
+            <specular r="0.5" g="0.5" b="0.5" a="1.0" />
         </omni>
 
         <omni id="demoLight2" enabled="0">
@@ -35,20 +35,23 @@
 
     <textures>
         <texture id="demoTexture" file="scenes/images/vidral.jpg" />
+        <texture id="wafer" file="scenes/images/wafer.jpg" />
+        <texture id="ice_cream" file="scenes/images/ice_cream.jpg" />
+        <texture id="pebble_floor" file="scenes/images/pebble_floor.jpg" />
     </textures>
 
     <materials>
         <material id="demoMaterial" shininess="10">
-            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
-            <ambient r="1.0" g="0.0" b="0.0" a="1.0" />
-            <diffuse r="0.6" g="0.0" b="0.0" a="1.0" />
-            <specular r="0.6" g="0.0" b="0.0" a="1.0" />
+             <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="0.0" g="0.0" b="0.0" a="1.0" />
+            <diffuse r="1.0" g="0.3" b="0.3" a="1.0" />
+            <specular r="0.5" g="0.15" b="0.15" a="1.0" />
         </material>
         <material id="demoMaterial2" shininess="10">
             <emission r="0.0" g="0.0" b="0.0" a="1.0" />
-            <ambient r="0.0" g="1.0" b="0.0" a="1.0" />
-            <diffuse r="0.0" g="0.6" b="0.0" a="1.0" />
-            <specular r="0.0" g="0.6" b="0.0" a="1.0" />
+            <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
+            <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
+            <specular r="1.0" g="1.0" b="1.0" a="1.0" />
         </material>
     </materials>
 
@@ -70,7 +73,7 @@
             <rectangle x1="0" y1="0" x2="1" y2="1" />
         </primitive>
         <primitive id="demoTriangle">
-            <triangle x1="-1.5" y1="0" z1="-0.75" x2="0" y2="0" z2="1.25" x3="1.5" y3="0" z3="-0.75" />
+            <triangle x1="-1.5" y1="0.1" z1="-0.75" x2="0" y2="0.1" z2="1.25" x3="1.5" y3="0.1" z3="-0.75" />
         </primitive>
         <primitive id="demoCylinder">
             <cylinder base="2.5" top="0" height="10" slices="40" stacks="60"/>
@@ -101,11 +104,23 @@
             <materials>
                 <material id="inherit"/>
             </materials>
-            <texture id="none"/>
+            <texture id="wafer"/>
             <children>
                 <primitiveref id="demoTorus" />
-                <primitiveref id="demoSphere" />
+                
                 <primitiveref id="demoCylinder"/>
+            </children>
+        </component>
+        <component id="iceBall1">
+            <transformation>
+                <transformationref id="transformIceCream"/>
+            </transformation>
+            <materials>
+                <material id="inherit"/>
+            </materials>
+            <texture id="ice_cream"/>
+            <children>
+                <primitiveref id="demoSphere" />
             </children>
         </component>
         <component id="ground">
@@ -115,7 +130,7 @@
             <materials>
                 <material id="inherit"/>
             </materials>
-            <texture id="demoTexture"/>
+            <texture id="pebble_floor"/>
             <children>
                 <primitiveref id="demoRectangle" />
             </children>
@@ -127,7 +142,7 @@
             <materials>
                 <material id="demoMaterial" />
             </materials>
-            <texture id="demoTexture"/>
+            <texture id="ice_cream"/>
             <children>
                 <primitiveref id="sphere2"/>
             </children>
@@ -159,6 +174,24 @@
                 <componentref id="cherryStick"/>
             </children>
         </component>
+
+        <component id="parede">
+            <transformation>
+                <rotate axis="y" angle="90"/>
+                <scale x="35" y="40" z="15"/>
+                <translate x="-0.5" y="0" z="-0.5"/>
+            </transformation>
+            <materials>
+                <material id="inherit"/>
+            </materials>
+            <texture id="ice_cream"/>
+            <children>
+                <primitiveref id="demoRectangle" />
+            </children>
+        </component>
+
+
+
         <component id="demoRoot">
             <transformation>
             </transformation>
@@ -169,11 +202,18 @@
             <texture id="demoTexture"/>
             <children>
                 <componentref id="iceCream" />
+                <componentref id="iceBall1" />
                 <primitiveref id="demoTriangle"/>
                 <componentref id="ground"/>
                 <componentref id="iceBall2"/>
                 <componentref id="cherry"/>
+                <componentref id="parede"/>
             </children>
         </component>
+
+
+
+
+
     </components>
 </sxs>
