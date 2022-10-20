@@ -3,7 +3,7 @@
 
     <views default="defaultCamera">
         <perspective id="defaultCamera" near="0.1" far="500" angle="45">
-            <from x="0" y="20" z="40" />
+            <from x="20" y="20" z="20" />
             <to x="0" y="10" z="0" />
         </perspective>
         <perspective id="defaultCamera2" near="0.1" far="500" angle="45">
@@ -19,7 +19,7 @@
 
     <lights>
         <omni id="demoLight" enabled="1">
-            <location x="0" y="20" z="0" w="1.0" />
+            <location x="20.8" y="11.9" z="10" w="1.0" />
             <ambient r="0" g="0" b="0" a="1.0" />
             <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
             <specular r="0.5" g="0.5" b="0.5" a="1.0" />
@@ -63,10 +63,9 @@
             <rotate axis="x" angle="90"/>
         </transformation>
 
-        <transformation id="transformationGround"> 
-            
-            <translate x="-10" y="0" z="10"/>
-            <scale x="30" y="1" z="25"/>
+        <transformation id="transformationGround">
+            <scale x="35" y="1" z="15"/>
+            <translate x="-0.5" y="0" z="0.5"/>
             <rotate axis="x" angle="-90"/>
         </transformation>
     </transformations>
@@ -102,104 +101,9 @@
         <primitive id="poleCylinder">
             <cylinder base="2" top="2" height="40" slices="40" stacks="60"/>
         </primitive>
-        
     </primitives>
 
     <components>
-        <component id="iceCream">
-            <transformation>
-                <transformationref id="transformIceCream"/>
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="wafer"/>
-            <children>
-                <primitiveref id="demoTorus" />
-                
-                <primitiveref id="demoCylinder"/>
-            </children>
-        </component>
-        <component id="iceBall1">
-            <transformation>
-                <transformationref id="transformIceCream"/>
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="ice_cream"/>
-            <children>
-                <primitiveref id="demoSphere" />
-            </children>
-        </component>
-        <component id="ground">
-            <transformation>
-                <transformationref id="transformationGround"/>
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="pebble_floor"/>
-            <children>
-                <primitiveref id="demoRectangle" />
-            </children>
-        </component>
-        <component id="iceBall2">
-            <transformation>
-                <translate x="0" y="13" z="0"/>
-            </transformation>
-            <materials>
-                <material id="demoMaterial" />
-            </materials>
-            <texture id="ice_cream"/>
-            <children>
-                <primitiveref id="sphere2"/>
-            </children>
-        </component>
-        <component id="cherryStick">
-            <transformation>
-                <translate x='0' y='0.5' z='0'/>
-                <rotate axis='z' angle='-30'/>
-                <rotate axis='x' angle='-90'/>
-            </transformation>
-            <materials>
-                <material id="demoMaterial" />
-            </materials>
-            <texture id="demoTexture"/>
-            <children>
-                <primitiveref id="cherryStick"/>
-            </children>
-        </component>
-        <component id="cherry">
-            <transformation>
-                <translate x="0" y="15.5" z="0"/>
-            </transformation>
-            <materials>
-                <material id="demoMaterial" />
-            </materials>
-            <texture id="none"/>
-            <children>
-                <primitiveref id="cherryBall"/>
-                <componentref id="cherryStick"/>
-            </children>
-        </component>
-
-        <component id="parede">
-            <transformation>
-                <translate x="20" y="0" z="-15"/>
-                <scale x="35" y="40" z="15"/>
-                <rotate axis="z" angle="90"/>
-                
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="ice_cream"/>
-            <children>
-                <primitiveref id="demoRectangle" />
-            </children>
-        </component>
-
         <component id="pyramidside1">
             <transformation>
                 <rotate axis="y" angle="0"/> 
@@ -305,8 +209,7 @@
 
         <component id="ice_cream_board">
             <transformation>
-                <translate x='10' y='0' z='0'/>
-                
+                <scale x='1' y='1.0' z='1'/>
             </transformation>
             <materials>
                 <material id="inherit"/>
@@ -319,10 +222,24 @@
             </children>
         </component>
 
+        <component id="ground">
+            <transformation>
+                <transformationref id="transformationGround"/>
+            </transformation>
+            <materials>
+                <material id="inherit"/>
+            </materials>
+            <texture id="pebble_floor" length_s="1" length_t="1" />
+            <children>
+                <primitiveref id="demoRectangle" />
+            </children>
+        </component>
+
 
 
         <component id="demoRoot">
             <transformation>
+                <translate x='0' y='0' z='0'/>
             </transformation>
             <materials>
                 <material id="demoMaterial" />
@@ -330,13 +247,8 @@
             </materials>
             <texture id="demoTexture"/>
             <children>
-                <componentref id="iceCream" />
-                <componentref id="iceBall1" />
-                <primitiveref id="demoTriangle"/>
+
                 <componentref id="ground"/>
-                <componentref id="iceBall2"/>
-                <componentref id="cherry"/>
-                <componentref id="parede"/>
                 <componentref id="ice_cream_board"/>
             </children>
         </component>
