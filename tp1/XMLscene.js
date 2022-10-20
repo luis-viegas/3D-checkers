@@ -36,7 +36,7 @@ export class XMLscene extends CGFscene {
     this.axis = new CGFaxis(this);
     this.setUpdatePeriod(100);
     //This variable allows to change between materials pressing the button m/M
-    this.currentMaterial = 1;
+    this.currentMaterial = 0;
 
     // this variable allows to display the axis (it starts disabled)
     this.displayAxis = false;
@@ -179,6 +179,10 @@ export class XMLscene extends CGFscene {
       // Draw axis
       if (this.displayAxis) {
         this.axis.display();
+      }
+
+      for(let i = 0; i < this.lights.length; i++){
+        this.lights[i].update();
       }
 
       // Displays the scene (MySceneGraph function).
