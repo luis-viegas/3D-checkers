@@ -19,6 +19,9 @@ export class MyTriangle extends CGFobject {
         this.z2 = z2;
         this.z3 = z3;
 
+        this.length_s = 1;
+        this.length_t = 1;
+
         /**
          * Distance between vertices
          * a = p1 to p2
@@ -72,11 +75,11 @@ export class MyTriangle extends CGFobject {
 		v
         t
         */
-        //TODO Textures for triangles
+
 		this.texCoords = [
-			0, 1,
-			1, 1,
-			0, 0
+			0, 0,
+			this.cosAC,this.sinAC,
+			1, 0
 		]
 		this.primitiveType = this.scene.gl.TRIANGLES;
 		this.initGLBuffers();
@@ -87,8 +90,13 @@ export class MyTriangle extends CGFobject {
 	 * Updates the list of texture coordinates of the rectangle
 	 * @param {Array} coords - Array of texture coordinates
 	 */
-	updateTexCoords(coords) {
-		this.texCoords = [...coords];
+	updateTexCoords(lenght_s, lenght_t) {
+        this.texCoords = [
+            0, 0,
+            this.c*this.cosAC/lenght_s,this.c*this.sinAC/lenght_t,
+            this.a/lenght_s, 0
+        ]
+
 		this.updateTexCoordsGLBuffers();
 	}
 
