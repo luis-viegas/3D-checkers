@@ -1,20 +1,26 @@
 <sxs>
     <scene root="demoRoot" axis_length="5"/>
 
-    <views default="defaultCamera">
-        <perspective id="defaultCamera" near="0.1" far="500" angle="45">
-            <from x="0" y="30" z="80" />
-            <to x="0" y="20" z="0" />
-        </perspective>
-        <perspective id="defaultCamera2" near="0.1" far="500" angle="45">
-            <from x="-30" y="-15" z="-30" />
-            <to x="0" y="2" z="0" />
-        </perspective>
-        <ortho id="45degortho"  near="0" far="30" left="30" right="30" top="30" bottom="30" >
-            <from x="0" y="35" z="35" />
+    <views default="default">
+        <ortho id="45degortho"  near="0" far="500" left="-50" right="50" top="50" bottom="0" >
+            <from x="10" y="0" z="10" />
             <to x="0" y="0" z="0" />
             <up x="0" y="1" z="0" /> <!-- opcional, default 0,1,0 -->
         </ortho>
+        <ortho id="top"  near="0" far="500" left="-50" right="50" top="50" bottom="-10" >
+            <from x="0" y="30" z="10" />
+            <to x="0" y="0" z="0" />
+            <up x="0" y="-1" z="0" /> <!-- opcional, default 0,1,0 -->
+        </ortho>
+        <perspective id="default" near="0.1" far="500" angle="45">
+            <from x="0" y="30" z="80" />
+            <to x="0" y="20" z="0" />
+        </perspective>
+        <perspective id="birdView" near="0.1" far="500" angle="45">
+            <from x="30" y="45" z="30" />
+            <to x="0" y="2" z="0" />
+        </perspective>
+        
     </views>
 
     <ambient>
