@@ -296,7 +296,7 @@
             <materials>
                 <material id="inherit"/>
             </materials>
-            <texture id="menu" length_s="3" length_t="3"/>
+            <texture id="menu" length_s="1" length_t="1"/>
             <children>
                 <primitiveref id="demoRectangle" />
             </children>
