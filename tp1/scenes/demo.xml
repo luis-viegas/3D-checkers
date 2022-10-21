@@ -456,19 +456,7 @@
             </children>
         </component>
 
-        <component id="full_ice_cream">
-            <transformation>
-                <translate x='20' y='0' z='0'/>
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="none"/>
-            <children>
-                <componentref id="pyramid"/>
-                <componentref id="pole2"/>
-            </children>
-        </component>
+
 
 
 
