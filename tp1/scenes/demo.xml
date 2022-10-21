@@ -3,13 +3,18 @@
 
     <views default="defaultCamera">
         <perspective id="defaultCamera" near="0.1" far="500" angle="45">
-            <from x="0" y="30" z="50" />
+            <from x="0" y="30" z="80" />
             <to x="0" y="20" z="0" />
         </perspective>
         <perspective id="defaultCamera2" near="0.1" far="500" angle="45">
             <from x="-30" y="-15" z="-30" />
             <to x="0" y="2" z="0" />
         </perspective>
+        <ortho id="45degortho"  near="0" far="30" left="30" right="30" top="30" bottom="30" >
+            <from x="0" y="35" z="35" />
+            <to x="0" y="0" z="0" />
+            <up x="0" y="1" z="0" /> <!-- opcional, default 0,1,0 -->
+        </ortho>
     </views>
 
     <ambient>
@@ -32,15 +37,17 @@
             <specular r="1.0" g="1.0" b="1.0" a="1.0" />
         </omni>
 
-        <spot id="lamp1" enabled="1">
-            <location x="-10" y="32" z="0" w="1.0" />
+        <spot id="lamp1" enabled="1" angle="45" exponent="0">
+            <location x="-10" y="32" z="20" w="1.0" />
+            <target x="-10" y="0" z="0" />
             <ambient r="0" g="0" b="0" a="1.0" />
             <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
             <specular r="1.0" g="1.0" b="1.0" a="1.0" />
         </spot>
 
-        <spot id="lamp2" enabled="1">
-            <location x="20" y="32" z="0" w="1.0" />
+        <spot id="lamp2" enabled="1"  angle="45" exponent="0">
+            <location x="20" y="32" z="20" w="1.0" />
+            <target x="20" y="0" z="0" />
             <ambient r="0" g="0" b="0" a="1.0" />
             <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
             <specular r="1.0" g="1.0" b="1.0" a="1.0" />
@@ -72,6 +79,18 @@
             <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
             <specular r="1.0" g="1.0" b="1.0" a="1.0" />
         </material>
+        <material id="demoMaterial3" shininess="10">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
+            <diffuse r="0.3" g="1.0" b="0.3" a="1.0" />
+            <specular r="0.15" g="0.5" b="0.15" a="1.0" />
+        </material>
+        <material id="demoMaterial4" shininess="10">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
+            <diffuse r="0.3" g="0.3" b="1.0" a="1.0" />
+            <specular r="0.15" g="0.15" b="0.5" a="1.0" />
+        </material>
     </materials>
 
     <transformations>
@@ -82,8 +101,8 @@
 
         <transformation id="transformationGround"> 
             
-            <translate x="-20" y="0" z="10"/>
-            <scale x="50" y="1" z="25"/>
+            <translate x="-20" y="0" z="30"/>
+            <scale x="50" y="1" z="45"/>
             <rotate axis="x" angle="-90"/>
         </transformation>
     </transformations>
@@ -167,6 +186,9 @@
             </transformation>
             <materials>
                 <material id="demoMaterial" />
+                <material id="demoMaterial2" />
+                <material id="demoMaterial3" />
+                <material id="demoMaterial4" />
             </materials>
             <texture id="ice_cream"/>
             <children>
@@ -352,7 +374,7 @@
 
         <component id="door">
             <transformation>
-                <translate x="4" y="0" z="10"/>
+                <translate x="4" y="0" z="1"/>
                 <scale x="2" y="4" z="1"/>
                 
             </transformation>
@@ -367,7 +389,7 @@
 
         <component id="window1">
             <transformation>
-                <translate x="1.5" y="6.0" z="10"/>
+                <translate x="1.5" y="6.0" z="1"/>
                 <scale x="2" y="2" z="1"/>
                 
             </transformation>
@@ -382,7 +404,7 @@
 
         <component id="window2">
             <transformation>
-                <translate x="6.6" y="6.0" z="0.01"/>
+                <translate x="6.6" y="6.0" z="1"/>
                 <scale x="2" y="2" z="1"/>
                 <rotate axis="z" angle="0"/>
                 
@@ -427,15 +449,17 @@
             </children>
         </component>
 
+
         <component id="lamp1">
             <transformation>
-                <translate x='-10' y='0' z='0'/>
+                <translate x='-10' y='0' z='20'/>
             </transformation>
             <materials>
                 <material id="inherit"/>
             </materials>
             <texture id="none"/>
             <children>
+                <componentref id="lantern2"/>
                 <componentref id="pyramid"/>
                 <componentref id="pole2"/>
             </children>
@@ -443,7 +467,7 @@
 
         <component id="lamp2">
             <transformation>
-                <translate x='20' y='0' z='0'/>
+                <translate x='20' y='0' z='20'/>
             </transformation>
             <materials>
                 <material id="inherit"/>
@@ -465,7 +489,7 @@
             </transformation>
             <materials>
                 <material id="demoMaterial2" />
-                <material id="demoMaterial" />
+                
                 
             </materials>
             <texture id="demoTexture"/>

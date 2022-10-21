@@ -311,8 +311,10 @@ export class MySceneGraph {
             if (grandChildren.length == 3) {
               up = grandChildren[2];
               if (up.nodeName != "up") return "view must have a up tag";
-              const up_coords = this.parseCoordinates3D(up, "up");
-              if (!Array.isArray(up_coords)) return up_coords;
+              up = this.parseCoordinates3D(up, "up");
+              console.log(up);
+              if (!Array.isArray(up)) return up;
+
               //Create ortho camera
             } else {
               up = [0, 1, 0];
@@ -326,7 +328,7 @@ export class MySceneGraph {
               view_far,
               vec3.fromValues(...from_coords),
               vec3.fromValues(...to_coords),
-              vec3.fromValues(...up_coords)
+              vec3.fromValues(...up)
             );
             this.views[view_id] = ortho_camera;
 
