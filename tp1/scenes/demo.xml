@@ -399,7 +399,7 @@
         <component id="house">
             <transformation>
                 <translate x="-20" y="0" z="-15"/>
-                <scale x="5" y="5" z="0"/>
+                <scale x="5" y="5" z="1"/>
             </transformation>
             <materials>
                 <material id="inherit"/>
@@ -411,6 +411,19 @@
                 <componentref id="door"/>
                 <componentref id="window1"/>
                 <componentref id="window2"/>
+            </children>
+        </component>
+
+        <component id="lantern2">
+            <transformation>
+                <translate x='0' y='30' z='0'/>
+            </transformation>
+            <materials>
+                <material id="demoMaterial2"/>
+            </materials>
+            <texture id="none"/>
+            <children>
+                <primitiveref id="demoSphere"/>
             </children>
         </component>
 
@@ -437,6 +450,7 @@
             </materials>
             <texture id="none"/>
             <children>
+                <componentref id="lantern2"/>
                 <componentref id="pyramid"/>
                 <componentref id="pole2"/>
             </children>

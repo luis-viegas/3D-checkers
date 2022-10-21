@@ -42,7 +42,7 @@ export class MyInterface extends CGFinterface {
   }
 
   processKeyDown(event) {
-    if (event.key == "m") {
+    if (event.key == "m" || event.key == "M") {
       this.scene.changeMaterialId();
     }
     this.activeKeys[event.code] = true;

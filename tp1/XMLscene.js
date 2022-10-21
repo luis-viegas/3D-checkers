@@ -200,7 +200,7 @@ export class XMLscene extends CGFscene {
    * draws its children
    * @param {object} component
    */
-  drawComponent(component, previousAppId, previousTexId) {
+  drawComponent(component, previousAppId, previousTex) {
     if (component.transformation != undefined)
       this.multMatrix(component.transformation);
 
@@ -212,24 +212,37 @@ export class XMLscene extends CGFscene {
       component.materials[currentComponentId] !== "inherit"
         ? component.materials[currentComponentId]
         : previousAppId;
-    let textureId;
+    let textureId, length_s, length_t;
 
     switch (component.texture.id) {
       case "inherit":
-        textureId = previousTexId;
+        textureId = previousTex.id;
+        length_s = previousTex.length_s;
+        length_t = previousTex.length_t;
         break;
       case "none":
         textureId = null;
+        length_s = 1;
+        length_t = 1;
         break;
       default:
         textureId = component.texture.id;
+        length_s = component.texture.length_s;
+        length_t = component.texture.length_t;
+
         break;
+    }
+
+    let textParent = {
+      'id': textureId,
+      'length_s': length_s,
+      'length_t': length_t
     }
 
     for (let i = 0; i < component.children.length; i++) {
       this.pushMatrix();
 
-      this.drawComponent(component.children[i], appearenceId, textureId);
+      this.drawComponent(component.children[i], appearenceId, textParent );
 
       this.popMatrix();
     }
@@ -252,10 +265,7 @@ export class XMLscene extends CGFscene {
     currentApperence.apply();
 
     for (let j = 0; j < component.primitives.length; j++) {
-      component.primitives[j].updateTexCoords(
-        component.texture.length_s,
-        component.texture.length_s
-      );
+      component.primitives[j].updateTexCoords(length_s, length_t);
       component.primitives[j].display();
     }
   }
