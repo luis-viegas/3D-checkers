@@ -3,8 +3,8 @@
 
     <views default="defaultCamera">
         <perspective id="defaultCamera" near="0.1" far="500" angle="45">
-            <from x="0" y="20" z="40" />
-            <to x="0" y="10" z="0" />
+            <from x="0" y="30" z="50" />
+            <to x="0" y="20" z="0" />
         </perspective>
         <perspective id="defaultCamera2" near="0.1" far="500" angle="45">
             <from x="-30" y="-15" z="-30" />
@@ -40,6 +40,9 @@
         <texture id="pebble_floor" file="scenes/images/pebble_floor.jpg" />
         <texture id="menu" file="scenes/images/menu.jpg" />
         <texture id="metal" file="scenes/images/metal.jpg" />
+        <texture id="window" file="scenes/images/window.jpg" />
+        <texture id="door" file="scenes/images/door.jpg" />
+        <texture id="wall" file="scenes/images/wall.jpg" />
     </textures>
 
     <materials>
@@ -65,8 +68,8 @@
 
         <transformation id="transformationGround"> 
             
-            <translate x="-10" y="0" z="10"/>
-            <scale x="30" y="1" z="25"/>
+            <translate x="-20" y="0" z="10"/>
+            <scale x="50" y="1" z="25"/>
             <rotate axis="x" angle="-90"/>
         </transformation>
     </transformations>
@@ -319,6 +322,86 @@
             </children>
         </component>
 
+        <component id="wall">
+            <transformation>
+                <translate x="0" y="0" z="0"/>
+                <scale x="10" y="10" z="1"/>
+                <rotate axis="z" angle="0"/>
+                
+            </transformation>
+            <materials>
+                <material id="inherit"/>
+            </materials>
+            <texture id="wall"/>
+            <children>
+                <primitiveref id="demoRectangle" />
+            </children>
+        </component>
+
+        <component id="door">
+            <transformation>
+                <translate x="4" y="0" z="10"/>
+                <scale x="2" y="4" z="1"/>
+                
+            </transformation>
+            <materials>
+                <material id="inherit"/>
+            </materials>
+            <texture id="door"/>
+            <children>
+                <primitiveref id="demoRectangle" />
+            </children>
+        </component>
+
+        <component id="window1">
+            <transformation>
+                <translate x="1.5" y="6.0" z="10"/>
+                <scale x="2" y="2" z="1"/>
+                
+            </transformation>
+            <materials>
+                <material id="inherit"/>
+            </materials>
+            <texture id="window"/>
+            <children>
+                <primitiveref id="demoRectangle" />
+            </children>
+        </component>
+
+        <component id="window2">
+            <transformation>
+                <translate x="6.6" y="6.0" z="0.01"/>
+                <scale x="2" y="2" z="1"/>
+                <rotate axis="z" angle="0"/>
+                
+            </transformation>
+            <materials>
+                <material id="inherit"/>
+            </materials>
+            <texture id="window"/>
+            <children>
+                <primitiveref id="demoRectangle" />
+            </children>
+        </component>
+
+        <component id="house">
+            <transformation>
+                <translate x="-20" y="0" z="-15"/>
+                <scale x="5" y="5" z="0"/>
+            </transformation>
+            <materials>
+                <material id="inherit"/>
+            </materials>
+            <texture id="demoTexture"/>
+            <children>
+
+                <componentref id="wall"/>
+                <componentref id="door"/>
+                <componentref id="window1"/>
+                <componentref id="window2"/>
+            </children>
+        </component>
+
 
 
         <component id="demoRoot">
@@ -332,12 +415,11 @@
             <children>
                 <componentref id="iceCream" />
                 <componentref id="iceBall1" />
-                <primitiveref id="demoTriangle"/>
                 <componentref id="ground"/>
                 <componentref id="iceBall2"/>
                 <componentref id="cherry"/>
-                <componentref id="parede"/>
                 <componentref id="ice_cream_board"/>
+                <componentref id="house"/>
             </children>
         </component>
 
