@@ -2,12 +2,13 @@
 
 ## Group: T0xG0y
 
-| Name             | Number    | E-Mail             |
-| ---------------- | --------- | ------------------ |
-| Diogo Maia         | 201904974 | up201904974@fe.up.pt                |
-| Luis Viegas         | 201904979 |  up201904974@fe.up.pt         |
+| Name        | Number    | E-Mail               |
+| ----------- | --------- | -------------------- |
+| Diogo Maia  | 201904974 | up201904974@fe.up.pt |
+| Luis Viegas | 201904979 | up201904974@fe.up.pt |
 
-----
+---
+
 ## Project information
 
 - We implemented every required primitive as it was intended in the project description. We are specially proud on the MyCylinder since it can be a Cylinder, a Cone or a Cylinder with different base and top radius depending on the parameters given to it.
@@ -18,12 +19,17 @@
 
 - Cameras (perspectives and ortho) and lights(omni and spot) were implemented as well.
 
-- In the end, we implemented on the Interface, the possibility for our user to display the axis, to toggle on/off the lights and to change the camera.  
+- In the end, we implemented on the Interface, the possibility for our user to display the axis, to toggle on/off the lights and to change the camera.
 
 - Scene
-  - (Brief description of the created scene)
-  - (relative link to the scene)
-----
+
+  - Giant ice cream cone in front of an ice cream store alongside an ice cream board with two street lamps.
+
+  ![](./screenshots/1.png)
+  ![](./screenshots/2.png)
+
+---
+
 ## Issues/Problems
 
 - We had a consistent bug where the light would follow the camera when we would use the mouse. We noticed it was not only because the light was originally inside the object, as it was because we were not updating the lights on the display but only when we would turn them on/off. We fixed it by updating the lights on the display function.
