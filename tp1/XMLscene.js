@@ -98,7 +98,7 @@ export class XMLscene extends CGFscene {
           );
         }
 
-        
+        this.lights[i].setVisible(true);
         if (light[0]) this.lights[i].enable();
         else this.lights[i].disable();
 
@@ -169,7 +169,6 @@ export class XMLscene extends CGFscene {
     // Initialize Model-View matrix as identity (no transformation
     this.updateProjectionMatrix();
     this.loadIdentity();
- 
 
     // Apply transformations corresponding to the camera position relative to the origin
     this.applyViewMatrix();
@@ -182,7 +181,7 @@ export class XMLscene extends CGFscene {
         this.axis.display();
       }
 
-      for(let i = 0; i < this.lights.length; i++){
+      for (let i = 0; i < this.lights.length; i++) {
         this.lights[i].update();
       }
 
@@ -240,12 +239,23 @@ export class XMLscene extends CGFscene {
     let currentApperence = this.graph.appearences[appearenceId];
 
     currentApperence.setTexture(currTexture);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_WRAP_S,
+      this.gl.REPEAT
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_WRAP_T,
+      this.gl.REPEAT
+    );
     currentApperence.apply();
 
     for (let j = 0; j < component.primitives.length; j++) {
-      component.primitives[j].updateTexCoords(component.texture.length_s, component.texture.length_s);
+      component.primitives[j].updateTexCoords(
+        component.texture.length_s,
+        component.texture.length_s
+      );
       component.primitives[j].display();
     }
   }
