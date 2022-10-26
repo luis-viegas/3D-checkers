@@ -354,7 +354,7 @@
             <materials>
                 <material id="inherit"/>
             </materials>
-            <texture id="none"/>
+            <texture id="metal"/>
             <children>
                 <componentref id="pyramid" />
                 <componentref id="pole" />
