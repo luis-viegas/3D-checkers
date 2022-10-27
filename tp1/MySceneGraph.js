@@ -383,6 +383,8 @@ export class MySceneGraph {
    * @param {lights block element} lightsNode
    */
   parseLights(lightsNode) {
+    //TODO parse light atenuatuion
+    
     var children = lightsNode.children;
 
     this.lights = [];
