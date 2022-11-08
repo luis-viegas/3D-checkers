@@ -384,6 +384,7 @@ export class MySceneGraph {
    */
   parseLights(lightsNode) {
     //TODO parse light atenuatuion
+    //TODO correct light direction
     
     var children = lightsNode.children;
 
@@ -979,7 +980,35 @@ export class MySceneGraph {
           loops
         );
         this.primitives[primitiveId] = torus;
-      } else {
+      } else if( primitiveType == "patch"){
+        let degree_u = this.reader.getInteger(grandChildren[0], "degree_u");
+        let degree_v = this.reader.getInteger(grandChildren[0], "degree_v");
+        let parts_u = this.reader.getInteger(grandChildren[0], "parts_u");
+        let parts_v = this.reader.getInteger(grandChildren[0], "parts_v");
+        let controlPoints = [];
+
+        if(degree_u < 1 || degree_v < 1 || parts_u < 1 || parts_v < 1){
+          return "Invalid patch parameters";
+        }
+
+        let controlPointsNode = grandChildren[0].children;
+        if(grandChildren[0].children.length != (degree_u + 1) * (degree_v + 1)){
+          return "Invalid number of control points";
+        }
+
+        for(let i = 0; i < controlPointsNode.length; i++){
+          let x = this.reader.getFloat(controlPointsNode[i], "xx");
+          let y = this.reader.getFloat(controlPointsNode[i], "yy");
+          let z = this.reader.getFloat(controlPointsNode[i], "zz");
+
+          controlPoints.push([x, y, z, 1]);
+        }
+
+        let patch = new MyPatch(this.scene, primitiveId, degree_u, degree_v, parts_u, parts_v, controlPoints);
+        this.primitives[primitiveId] = patch;
+
+      }
+       else {
         console.warn("To do: Parse other primitives.");
       }
     }
