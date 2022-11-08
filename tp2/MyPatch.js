@@ -1,5 +1,16 @@
 import { CGFnurbsSurface, CGFnurbsObject } from '../lib/CGF.js';
 
+/**
+ * MyPatch class which represents a NURBS patch
+ * @constructor
+ * @param scene - Reference to MyScene object
+ * @param degreeU - Number of points in U
+ * @param degreeV - Number of points in V
+ * @param npartsU - Number of parts in U
+ * @param npartsV - Number of parts in V
+ * @param controlPoints - Control points
+ * 
+ */
 export class MyPatch{
     constructor(scene, id, degreeU, degreeV, npartsU, npartsV, controlPoints){
         this.scene = scene;
