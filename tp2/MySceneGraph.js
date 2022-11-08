@@ -10,6 +10,7 @@ import { MyRectangle } from "./MyRectangle.js";
 import { MyTriangle } from "./MyTriangle.js";
 import { MySphere } from "./MySphere.js";
 import { MyTorus } from "./MyTorus.js";
+import { MyPatch } from "./MyPatch.js";
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -801,7 +802,8 @@ export class MySceneGraph {
           grandChildren[0].nodeName != "triangle" &&
           grandChildren[0].nodeName != "cylinder" &&
           grandChildren[0].nodeName != "sphere" &&
-          grandChildren[0].nodeName != "torus")
+          grandChildren[0].nodeName != "torus" &&
+        grandChildren[0].nodeName != "patch")
       ) {
         return "There must be exactly 1 primitive type (rectangle, triangle, cylinder, sphere or torus)";
       }
@@ -1001,8 +1003,11 @@ export class MySceneGraph {
           let y = this.reader.getFloat(controlPointsNode[i], "y");
           let z = this.reader.getFloat(controlPointsNode[i], "z");
 
+          if(x == null || y == null || z == null){
+            return "Invalid control point";
+          }
 
-          controlPoints.push([x, y, z]);
+          controlPoints.push([x, y, z,1]);
         }
 
         let patch = new MyPatch(this.scene, primitiveId, degree_u, degree_v, parts_u, parts_v, controlPoints);

@@ -2,9 +2,9 @@
     <scene root="demoRoot" axis_length="5"/>
 
     <views default="defaultCamera">
-        <perspective id="defaultCamera" near="0.1" far="500" angle="45">
-            <from x="0" y="20" z="40" />
-            <to x="0" y="10" z="0" />
+        <perspective id="defaultCamera" near="0.1" far="5" angle="45">
+            <from x="0" y="3" z="3" />
+            <to x="0" y="0" z="0" />
         </perspective>
         <perspective id="defaultCamera2" near="0.1" far="500" angle="45">
             <from x="-30" y="-15" z="-30" />
@@ -25,12 +25,6 @@
             <specular r="0.5" g="0.5" b="0.5" a="1.0" />
         </omni>
 
-        <omni id="demoLight2" enabled="0">
-            <location x="12.8" y="9" z="20" w="1.0" />
-            <ambient r="0" g="0" b="0" a="1.0" />
-            <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
-            <specular r="1.0" g="1.0" b="1.0" a="1.0" />
-        </omni>
     </lights>
 
     <textures>
@@ -45,7 +39,7 @@
     <materials>
         <material id="demoMaterial" shininess="10">
              <emission r="0.0" g="0.0" b="0.0" a="1.0" />
-            <ambient r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
             <diffuse r="1.0" g="0.3" b="0.3" a="1.0" />
             <specular r="0.5" g="0.15" b="0.15" a="1.0" />
         </material>
@@ -101,255 +95,27 @@
         <primitive id="poleCylinder">
             <cylinder base="2" top="2" height="40" slices="40" stacks="60"/>
         </primitive>
+        <primitive id ="rectangle">
+            <patch degree_u ="1" parts_u ="20" degree_v ="1" parts_v ="20">
+                <controlpoint x ="-1" y ="-1" z ="0" />
+                <controlpoint x ="-1" y ="1" z ="0" />
+                <controlpoint x ="1" y ="-1" z ="0" />
+                <controlpoint x ="1" y ="1" z ="0" />
+            </patch>
+        </primitive>
     </primitives>
 
     <components>
-        <component id="pyramidside1">
-            <transformation>
-                <rotate axis="y" angle="0"/> 
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="inherit"/>
-            <children>
-                <primitiveref id="pyramidtriangle" />
-            </children>
-        </component>
-
-        <component id="pyramidside2">
-            <transformation>
-                <rotate axis="y" angle="90"/> 
-                
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="inherit"/>
-            <children>
-                <primitiveref id="pyramidtriangle" />
-            </children>
-        </component>
-
-        <component id="pyramidside3">
-            <transformation>
-                <rotate axis="y" angle="180"/> 
-                
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="inherit"/>
-            <children>
-                <primitiveref id="pyramidtriangle" />
-            </children>
-        </component>
-
-        <component id="pyramidside4">
-            <transformation>
-                <rotate axis="y" angle="270"/> 
-                
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="inherit"/>
-            <children>
-                <primitiveref id="pyramidtriangle" />
-            </children>
-        </component>
-
-        <component id="pyramid">
-            <transformation>
-                <scale x='1' y='1.0' z='1'/>
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="metal"/>
-            <children>
-                <componentref id="pyramidside1" />
-                <componentref id="pyramidside2" />
-                <componentref id="pyramidside3" />
-                <componentref id="pyramidside4" />
-            </children>
-        </component>
-
-        
-
-        <component id="pole">
-            <transformation>
-                <scale x='0.1' y='0.2' z='0.1'/>
-                <rotate axis="x" angle="-90"/>
-
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="metal"/>
-            <children>
-                <primitiveref id="poleCylinder" />
-            </children>
-        </component>
-        <component id="board">
-            <transformation>
-                <translate x='-2.5' y='7.5' z='0'/>
-                <scale x='5' y='10' z='1'/>
-                
-
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="menu"/>
-            <children>
-                <primitiveref id="demoRectangle" />
-            </children>
-        </component>
-
-        <component id="ice_cream_board">
-            <transformation>
-                <scale x='1' y='1.0' z='1'/>
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="none"/>
-            <children>
-                <componentref id="pyramid" />
-                <componentref id="pole" />
-                <componentref id="board" />
-            </children>
-        </component>
-
-        <component id="ground">
-            <transformation>
-                <transformationref id="transformationGround"/>
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="pebble_floor" length_s="1" length_t="1" />
-            <children>
-                <primitiveref id="demoRectangle" />
-            </children>
-        </component>
-
-
-        <component id="wall">
-            <transformation>
-                <translate x="0" y="0" z="0"/>
-                <scale x="10" y="10" z="1"/>
-                <rotate axis="z" angle="0"/>
-                
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="ice_cream"/>
-            <children>
-                <primitiveref id="demoRectangle" />
-            </children>
-        </component>
-
-        <component id="door">
-            <transformation>
-                <translate x="4" y="0" z="0.01"/>
-                <scale x="2" y="4" z="1"/>
-                <rotate axis="z" angle="0"/>
-                
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="none"/>
-            <children>
-                <primitiveref id="demoRectangle" />
-            </children>
-        </component>
-
-        <component id="window1">
-            <transformation>
-                <translate x="1.5" y="6.0" z="0.01"/>
-                <scale x="2" y="2" z="1"/>
-                <rotate axis="z" angle="0"/>
-                
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="none"/>
-            <children>
-                <primitiveref id="demoRectangle" />
-            </children>
-        </component>
-
-        <component id="window2">
-            <transformation>
-                <translate x="6.6" y="6.0" z="0.01"/>
-                <scale x="2" y="2" z="1"/>
-                <rotate axis="z" angle="0"/>
-                
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="none"/>
-            <children>
-                <primitiveref id="demoRectangle" />
-            </children>
-        </component>
-
-        <component id="house">
-            <transformation>
-                <translate x='0' y='0' z='0'/>
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="demoTexture"/>
-            <children>
-
-                <componentref id="wall"/>
-                <componentref id="door"/>
-                <componentref id="window1"/>
-                <componentref id="window2"/>
-            </children>
-        </component>
-
-        <component id="lamp">
-            <transformation>
-                <translate x='0' y='0' z='0'/>
-            </transformation>
-            <materials>
-                <material id="inherit"/>
-            </materials>
-            <texture id="none"/>
-            <children>
-                <componentref id="pyramid"/>
-                <componentref id="pole"/>
-            </children>
-        </component>
-
-
         <component id="demoRoot">
             <transformation>
-                <translate x='0' y='0' z='0'/>
             </transformation>
             <materials>
                 <material id="demoMaterial" />
-                <material id="demoMaterial2" />
             </materials>
             <texture id="demoTexture"/>
             <children>
-
-                <componentref id="lamp"/>
+                <primitiveref id="rectangle" />
             </children>
         </component>
-
-
-
-
-
     </components>
 </sxs>
