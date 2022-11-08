@@ -997,11 +997,12 @@ export class MySceneGraph {
         }
 
         for(let i = 0; i < controlPointsNode.length; i++){
-          let x = this.reader.getFloat(controlPointsNode[i], "xx");
-          let y = this.reader.getFloat(controlPointsNode[i], "yy");
-          let z = this.reader.getFloat(controlPointsNode[i], "zz");
+          let x = this.reader.getFloat(controlPointsNode[i], "x");
+          let y = this.reader.getFloat(controlPointsNode[i], "y");
+          let z = this.reader.getFloat(controlPointsNode[i], "z");
 
-          controlPoints.push([x, y, z, 1]);
+
+          controlPoints.push([x, y, z]);
         }
 
         let patch = new MyPatch(this.scene, primitiveId, degree_u, degree_v, parts_u, parts_v, controlPoints);
