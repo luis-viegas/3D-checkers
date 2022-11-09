@@ -1065,7 +1065,30 @@ export class MySceneGraph {
       var materialsIndex = nodeNames.indexOf("materials");
       var textureIndex = nodeNames.indexOf("texture");
       var childrenIndex = nodeNames.indexOf("children");
+      let highlightedIndex = nodeNames.indexOf("highlighted");
 
+      let highlighted = highlightedIndex != -1 ? grandChildren[highlightedIndex] : null;
+
+      if(highlighted != null){
+        let r = this.reader.getFloat(highlighted, "r");
+        let g = this.reader.getFloat(highlighted, "g");
+        let b = this.reader.getFloat(highlighted, "b");
+        let scale_h = this.reader.getFloat(highlighted, "scale_h");
+
+        if(r == null || g == null || b == null || scale_h == null){
+          return "Invalid highlighted component";
+        }
+
+        this.components[componentID].highlighted = {
+          r: r,
+          g: g,
+          b: b,
+          scale_h: scale_h
+        }
+      }
+      else{
+        this.components[componentID].highlighted = null;
+      }
       // Transformations
       if (transformationIndex == null) {
         return "There should be a 'transformation' camp, even if empty";
