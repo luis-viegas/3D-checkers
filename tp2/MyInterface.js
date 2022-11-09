@@ -82,8 +82,6 @@ export class MyInterface extends CGFinterface {
           .onChange(this.scene.updateLights.bind(this.scene, i));
       }
     }
-    console.log("things:");
-    console.log(this.scene.lights);
     console.log(this.scene);
   }
 

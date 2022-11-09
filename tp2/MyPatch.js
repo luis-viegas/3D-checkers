@@ -20,7 +20,7 @@ export class MyPatch{
         this.npartsU = npartsU;
         this.npartsV = npartsV;
         this.controlPoints = controlPoints;
-        console.log(this.controlPoints);
+
 
         this.vertexes = [];
 
