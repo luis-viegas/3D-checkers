@@ -103,6 +103,16 @@
                 <controlpoint x ="1" y ="1" z ="0" />
             </patch>
         </primitive>
+        <primitive id ="tent">
+            <patch degree_u ="1" parts_u ="20" degree_v ="2" parts_v ="20">
+                <controlpoint x ="-1" y ="0" z ="1" />
+                <controlpoint x ="-1" y ="2" z ="0" />
+                <controlpoint x ="-1" y ="0" z ="-1" />
+                <controlpoint x ="1" y ="0" z ="1" />
+                <controlpoint x ="1" y ="2" z ="0" />
+                <controlpoint x ="1" y ="0" z ="-1" />
+            </patch>
+        </primitive>
     </primitives>
 
     <components>
@@ -114,7 +124,7 @@
             </materials>
             <texture id="demoTexture"/>
             <children>
-                <primitiveref id="rectangle" />
+                <primitiveref id="tent" />
             </children>
         </component>
     </components>

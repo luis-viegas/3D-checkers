@@ -28,8 +28,7 @@ export class MyPatch{
             //Create a new array for each U
             let vertex_U = [];
             for(let j = 0; j < this.degreeV+1; j++){
-                vertex_U.push(this.controlPoints[i*(this.degreeU+1)+j]);
-
+                vertex_U.push(this.controlPoints[i*(this.degreeV+1)+j]);
             }
             this.vertexes.push(vertex_U);
         }
