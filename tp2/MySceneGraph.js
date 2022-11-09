@@ -313,7 +313,6 @@ export class MySceneGraph {
               up = grandChildren[2];
               if (up.nodeName != "up") return "view must have a up tag";
               up = this.parseCoordinates3D(up, "up");
-              console.log(up);
               if (!Array.isArray(up)) return up;
 
               //Create ortho camera
@@ -342,8 +341,6 @@ export class MySceneGraph {
       return "default view not created";
 
     this.log("Parsed views");
-    console.log(this.views);
-    console.log(this.default_view);
 
     return null;
   }
@@ -507,7 +504,6 @@ export class MySceneGraph {
       );
 
     this.log("Parsed lights");
-    console.log(this.lights);
     return null;
   }
 
@@ -559,7 +555,6 @@ export class MySceneGraph {
 
       let new_texture = new CGFtexture(this.scene, file);
       this.textures[id] = new_texture;
-      console.log(this.textures);
     }
 
     this.log("Parsed textures");
@@ -609,7 +604,6 @@ export class MySceneGraph {
 
       for (let j = 0; j < grandChildren.length; j++) {
         const node = grandChildren[j].nodeName;
-        this.log(node);
         if (node in materialProperties)
           return (
             "Parameters for a material must be emission, diffuse, ambient or specular. Not: " +
@@ -653,11 +647,9 @@ export class MySceneGraph {
       );
 
       this.appearences[materialID] = appearence;
-      console.log(this.appearences);
     }
 
     //this.log("Parsed materials");
-    console.log(this.materials);
     return null;
   }
 
@@ -744,7 +736,6 @@ export class MySceneGraph {
             }
 
             let angleRad = (angle * Math.PI) / 180.0;
-            console.log(angleRad);
             transfMatrix = mat4.rotate(
               transfMatrix,
               transfMatrix,
@@ -752,7 +743,6 @@ export class MySceneGraph {
               axisVector
             );
 
-            this.log("Parsed rotation of " + angle + " in axis " + axis);
             break;
         }
       }
@@ -1084,7 +1074,6 @@ export class MySceneGraph {
       grandgrandChildren = grandChildren[transformationIndex].children;
       //There are no transformations
       if (grandgrandChildren.length == 0) {
-        this.log("Component " + componentID + " has no transformations");
       } else {
         //Verify if it a transformationref and there is no more than 1
         if (
@@ -1174,7 +1163,6 @@ export class MySceneGraph {
       this.components[componentID].primitives = childrenComponents.primitives;
     }
 
-    console.log(this.components);
   }
 
   /**
@@ -1334,7 +1322,6 @@ export class MySceneGraph {
             }
 
             let angleRad = (angle * Math.PI) / 180.0;
-            console.log(angleRad);
             transfMatrix = mat4.rotate(
               transfMatrix,
               transfMatrix,
@@ -1342,7 +1329,6 @@ export class MySceneGraph {
               axisVector
             );
 
-            this.log("Parsed rotation of " + angle + " in axis " + axis);
             break;
         }
       }

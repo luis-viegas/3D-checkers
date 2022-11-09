@@ -33,7 +33,6 @@ export class MyPatch{
             }
             this.vertexes.push(vertex_U);
         }
-        console.log(this.vertexes);
 
         this.surface = new CGFnurbsSurface(this.degreeU, this.degreeV, this.vertexes);
         this.obj = new CGFnurbsObject(this.scene, this.npartsU, this.npartsV, this.surface);

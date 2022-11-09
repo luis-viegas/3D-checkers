@@ -108,7 +108,6 @@ export class XMLscene extends CGFscene {
       }
     }
 
-    console.log(this.lights);
   }
 
   /** Handler called when the graph is finally loaded.
@@ -158,10 +157,11 @@ export class XMLscene extends CGFscene {
 
   /**
    * Displays the scene.
-   */
+   */ 
   display() {
     // ---- BEGIN Background, camera and axis setup
 
+    if (!this.sceneInited) return;
     // Clear image and depth buffer everytime we update the scene
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
@@ -175,21 +175,21 @@ export class XMLscene extends CGFscene {
 
     this.pushMatrix();
 
-    if (this.sceneInited) {
-      // Draw axis
-      if (this.displayAxis) {
-        this.axis.display();
-      }
-
-      for (let i = 0; i < this.lights.length; i++) {
-        this.lights[i].update();
-      }
-
-      // Displays the scene (MySceneGraph function).
-      const idRoot = this.graph.idRoot;
-      const root = this.graph.components[idRoot];
-      this.drawComponent(root, null, null);
+    
+    // Draw axis
+    if (this.displayAxis) {
+      this.axis.display();
     }
+
+    for (let i = 0; i < this.lights.length; i++) {
+      this.lights[i].update();
+    }
+
+    // Displays the scene (MySceneGraph function).
+    const idRoot = this.graph.idRoot;
+    const root = this.graph.components[idRoot];
+    this.drawComponent(root, null, null);
+
 
     this.popMatrix();
     // ---- END Background, camera and axis setup
@@ -206,7 +206,6 @@ export class XMLscene extends CGFscene {
 
     const currentComponentId =
       this.currentMaterial % component.materials.length;
-    //console.log(component,currentComponentId ,component.materials[currentComponentId])
 
     const appearenceId =
       component.materials[currentComponentId] !== "inherit"
