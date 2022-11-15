@@ -1,27 +1,42 @@
 <!DOCTYPE html>
 <html>
+
 <head lang="en">
     <meta charset="UTF-8">
     <title>SGI - Parser Example</title>
     <link rel="icon" href="data:,">
 
-<style>
-body, html {
-    border: 0;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-}
+    <style>
+        body,
+        html {
+            border: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
 
-canvas {
-    width: 100%;
-    height: 100%;
-}
-</style>
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
+
 <body>
 
-<script type="module" src="main.js"></script>
+    <script type="module" src="main.js"></script>
+
+    <div id="shaders">
+        Vertex Shader (VS)
+        <div id="vshader">
+            (loading...)
+        </div>
+        Fragment Shader (FS)
+        <div id="fshader">
+            (loading...)
+        </div>
+    </div>
 
 </body>
+
 </html>
