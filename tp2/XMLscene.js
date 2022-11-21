@@ -8,13 +8,12 @@ var DEGREE_TO_RAD = Math.PI / 180;
  * Function to load a text file from a URL (used to display shader sources)
  */
 
- function getStringFromUrl(url) {
-	var xmlHttpReq = new XMLHttpRequest();
-    xmlHttpReq.open("GET", url, false);
-    xmlHttpReq.send();
-    return xmlHttpReq.responseText;
+function getStringFromUrl(url) {
+  var xmlHttpReq = new XMLHttpRequest();
+  xmlHttpReq.open("GET", url, false);
+  xmlHttpReq.send();
+  return xmlHttpReq.responseText;
 }
-
 
 /**
  * XMLscene class, representing the scene that is to be rendered.
@@ -27,6 +26,8 @@ export class XMLscene extends CGFscene {
   constructor(myinterface) {
     super();
     this.selectedExampleShader = 0;
+    this.scaleFactor = 0;
+    this.scaleShader = 0;
 
     this.interface = myinterface;
   }
@@ -121,68 +122,50 @@ export class XMLscene extends CGFscene {
         i++;
       }
     }
-
   }
 
   onShaderCodeVizChanged(v) {
-    if (v)
-      this.shadersDiv.style.display = "block";
-    else
-      this.shadersDiv.style.display = "none";
+    if (v) this.shadersDiv.style.display = "block";
+    else this.shadersDiv.style.display = "none";
   }
 
-  onSelectedShaderChanged(v) {
-		// update shader code
-		//this.activeShader(this.testShaders[v])
-
-	}
-
-  /** 
+  /**
    * Initializes the scene shaders with the values read from the XML file.
    */
-   initShaders() {
+  initShaders() {
+    /*
     this.testShaders = [
-			new CGFshader(this.gl, "shaders/flat.vert", "shaders/flat.frag"),
-			new CGFshader(this.gl, "shaders/uScale.vert", "shaders/uScale.frag"),
-			new CGFshader(this.gl, "shaders/varying.vert", "shaders/varying.frag"),
-			new CGFshader(this.gl, "shaders/texture1.vert", "shaders/texture1.frag"),
-			new CGFshader(this.gl, "shaders/texture2.vert", "shaders/texture2.frag"),
-			new CGFshader(this.gl, "shaders/texture3.vert", "shaders/texture3.frag"),
-			new CGFshader(this.gl, "shaders/texture3anim.vert", "shaders/texture3anim.frag"),
-			new CGFshader(this.gl, "shaders/texture1.vert", "shaders/sepia.frag"),
-			new CGFshader(this.gl, "shaders/texture1.vert", "shaders/convolution.frag")
-		];
+      new CGFshader(this.gl, "shaders/uScale.vert", "shaders/uScale.frag"),
+      new CGFshader(this.gl, "shaders/varying.vert", "shaders/varying.frag"),
+      new CGFshader(this.gl, "shaders/texture1.vert", "shaders/texture1.frag"),
+      new CGFshader(this.gl, "shaders/texture2.vert", "shaders/texture2.frag"),
+      new CGFshader(this.gl, "shaders/texture3.vert", "shaders/texture3.frag"),
+      new CGFshader(
+        this.gl,
+        "shaders/texture3anim.vert",
+        "shaders/texture3anim.frag"
+      ),
+      new CGFshader(this.gl, "shaders/texture1.vert", "shaders/sepia.frag"),
+      new CGFshader(
+        this.gl,
+        "shaders/texture1.vert",
+        "shaders/convolution.frag"
+      ),
+    ];
+    */
+
+    this.testShaders = [
+      new CGFshader(
+        this.gl,
+        "shaders/texture3anim.vert",
+        "shaders/texture3anim.frag"
+      ),
+    ];
+
+    this.testShaders[0].setUniformsValues({ uSampler2: 1 });
+    this.testShaders[0].setUniformsValues({ timeFactor: 0 });
 
     // additional texture will have to be bound to texture unit 1 later, when using the shader, with "this.texture2.bind(1);"
-		this.testShaders[4].setUniformsValues({ uSampler2: 1 });
-		this.testShaders[5].setUniformsValues({ uSampler2: 1 });
-		this.testShaders[6].setUniformsValues({ uSampler2: 1 });
-		this.testShaders[6].setUniformsValues({ timeFactor: 0 });
-
-    // Shaders interface variables
-
-		this.shadersList = {
-			'Flat Shading': 0,
-			'Passing a scale as uniform': 1,
-			'Passing a varying parameter from VS -> FS': 2,
-			'Simple texturing': 3,
-			'Multiple textures in the FS': 4,
-			'Multiple textures in VS and FS': 5,
-			'Animation example': 6,
-			'Sepia': 7,
-			'Convolution': 8
-		};
-
-		// shader code panels references
-		this.shadersDiv = document.getElementById("shaders");
-    console.log("this.shadersDiv", this.shadersDiv);
-		this.vShaderDiv = document.getElementById("vshader");
-		this.fShaderDiv = document.getElementById("fshader");
-
-		// force initial setup of shader code panels
-
-		//this.onShaderCodeVizChanged(this.showShaderCode);
-		//this.onSelectedShaderChanged(this.selectedExampleShader);
   }
 
   /** Handler called when the graph is finally loaded.
@@ -207,14 +190,11 @@ export class XMLscene extends CGFscene {
 
     this.initLights();
 
-    this.initShaders();
-
-
     this.initCameras();
 
-    this.interface.lightsConfig();
+    this.initShaders();
 
-    this.interface.shadersConfig();
+    this.interface.lightsConfig();
 
     this.interface.camerasConfig();
 
@@ -235,9 +215,19 @@ export class XMLscene extends CGFscene {
     console.log("Lights updated");
   }
 
+  // called periodically (as per setUpdatePeriod() in init())
+  update(t) {
+    // Dividing the time by 100 "slows down" the variation (i.e. in 100 ms timeFactor increases 1 unit).
+    // Doing the modulus (%) by 100 makes the timeFactor loop between 0 and 99
+    // ( so the loop period of timeFactor is 100 times 100 ms = 10s ; the actual animation loop depends on how timeFactor is used in the shader )
+    this.testShaders[0].setUniformsValues({
+      timeFactor: (t / 250) % 100,
+    });
+  }
+
   /**
    * Displays the scene.
-   */ 
+   */
   display() {
     // ---- BEGIN Background, camera and axis setup
 
@@ -254,9 +244,13 @@ export class XMLscene extends CGFscene {
     this.applyViewMatrix();
 
     this.pushMatrix();
-    
+
     this.setActiveShader(this.testShaders[this.selectedExampleShader]);
-    
+    this.graph.textures["barrel"].bind(0);
+    this.testShaders[this.selectedExampleShader].setUniformsValues({
+      normScale: Math.sin(this.scaleFactor),
+    });
+
     // Draw axis
     if (this.displayAxis) {
       this.axis.display();
@@ -270,7 +264,6 @@ export class XMLscene extends CGFscene {
     const idRoot = this.graph.idRoot;
     const root = this.graph.components[idRoot];
     this.drawComponent(root, null, null);
-
 
     this.popMatrix();
     // ---- END Background, camera and axis setup
@@ -314,15 +307,15 @@ export class XMLscene extends CGFscene {
     }
 
     let textParent = {
-      'id': textureId,
-      'length_s': length_s,
-      'length_t': length_t
-    }
+      id: textureId,
+      length_s: length_s,
+      length_t: length_t,
+    };
 
     for (let i = 0; i < component.children.length; i++) {
       this.pushMatrix();
 
-      this.drawComponent(component.children[i], appearenceId, textParent );
+      this.drawComponent(component.children[i], appearenceId, textParent);
 
       this.popMatrix();
     }

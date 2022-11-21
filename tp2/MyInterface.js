@@ -85,13 +85,6 @@ export class MyInterface extends CGFinterface {
     console.log(this.scene);
   }
 
-  shadersConfig() {
-    console.log("I RAN")
-    this.shaders = this.gui.addFolder("Shaders");
-    this.shaders.add(this.scene, 'selectedExampleShader', this.scene.shadersList)
-                .name('Shader examples');
-  }
-
   camerasConfig() {
     this.cameras = this.gui.addFolder("Cameras");
 
