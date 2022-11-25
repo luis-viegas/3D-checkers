@@ -1,7 +1,19 @@
-import { CGFappearance, CGFlight, CGFscene } from "../lib/CGF.js";
+import { CGFappearance, CGFlight, CGFscene, CGFshader } from "../lib/CGF.js";
 import { CGFaxis, CGFcamera } from "../lib/CGF.js";
 
 var DEGREE_TO_RAD = Math.PI / 180;
+
+/**
+ * getStringFromUrl(url)
+ * Function to load a text file from a URL (used to display shader sources)
+ */
+
+function getStringFromUrl(url) {
+  var xmlHttpReq = new XMLHttpRequest();
+  xmlHttpReq.open("GET", url, false);
+  xmlHttpReq.send();
+  return xmlHttpReq.responseText;
+}
 
 /**
  * XMLscene class, representing the scene that is to be rendered.
@@ -13,6 +25,9 @@ export class XMLscene extends CGFscene {
    */
   constructor(myinterface) {
     super();
+    this.selectedExampleShader = 0;
+    this.scaleFactor = 0;
+    this.scaleShader = 0;
 
     this.interface = myinterface;
   }
@@ -40,6 +55,8 @@ export class XMLscene extends CGFscene {
 
     // this variable allows to display the axis (it starts disabled)
     this.displayAxis = false;
+
+    this.toggleHighlight = new Object();
   }
 
   /**
@@ -92,7 +109,6 @@ export class XMLscene extends CGFscene {
         this.lights[i].setLinearAttenuation(light[6][1]);
         this.lights[i].setQuadraticAttenuation(light[6][2]);
 
-
         if (light[1] == "spot") {
           this.lights[i].setSpotCutOff(light[7]);
           this.lights[i].setSpotExponent(light[8]);
@@ -102,10 +118,21 @@ export class XMLscene extends CGFscene {
           // Substract the target from the location to get the direction
           let direction = [target[0]-location[0],target[1]-location[1], target[2]-location[2]];
           //Normalize the direction vector
-          let magnitude = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2]);
-          direction = [direction[0] / magnitude, direction[1] / magnitude, direction[2] / magnitude];
-          this.lights[i].setSpotDirection(direction[0], direction[1], direction[2]);
-          
+          let magnitude = Math.sqrt(
+            direction[0] * direction[0] +
+              direction[1] * direction[1] +
+              direction[2] * direction[2]
+          );
+          direction = [
+            direction[0] / magnitude,
+            direction[1] / magnitude,
+            direction[2] / magnitude,
+          ];
+          this.lights[i].setSpotDirection(
+            direction[0],
+            direction[1],
+            direction[2]
+          );
         }
 
         this.lights[i].setVisible(true);
@@ -117,7 +144,58 @@ export class XMLscene extends CGFscene {
         i++;
       }
     }
+  }
 
+  onShaderCodeVizChanged(v) {
+    if (v) this.shadersDiv.style.display = "block";
+    else this.shadersDiv.style.display = "none";
+  }
+
+  /**
+   * Initializes the scene shaders with the values read from the XML file.
+   */
+  initShaders() {
+    /*
+    this.testShaders = [
+      new CGFshader(this.gl, "shaders/uScale.vert", "shaders/uScale.frag"),
+      new CGFshader(this.gl, "shaders/varying.vert", "shaders/varying.frag"),
+      new CGFshader(this.gl, "shaders/texture1.vert", "shaders/texture1.frag"),
+      new CGFshader(this.gl, "shaders/texture2.vert", "shaders/texture2.frag"),
+      new CGFshader(this.gl, "shaders/texture3.vert", "shaders/texture3.frag"),
+      new CGFshader(
+        this.gl,
+        "shaders/texture3anim.vert",
+        "shaders/texture3anim.frag"
+      ),
+      new CGFshader(this.gl, "shaders/texture1.vert", "shaders/sepia.frag"),
+      new CGFshader(
+        this.gl,
+        "shaders/texture1.vert",
+        "shaders/convolution.frag"
+      ),
+    ];
+    */
+
+    this.testShaders = [
+      new CGFshader(this.gl, "shaders/texture1.vert", "shaders/texture1.frag"),
+      new CGFshader(
+        this.gl,
+        "shaders/texture3anim.vert",
+        "shaders/texture3anim.frag"
+      ),
+    ];
+
+    this.testShaders[1].setUniformsValues({ uSampler2: 1 });
+    this.testShaders[1].setUniformsValues({
+      timeFactor: 0,
+      red: 1.0,
+      green: 1.0,
+      blue: 1.0,
+    });
+
+    console.log("grafooo", this.graph);
+
+    // additional texture will have to be bound to texture unit 1 later, when using the shader, with "this.texture2.bind(1);"
   }
 
   /** Handler called when the graph is finally loaded.
@@ -144,9 +222,13 @@ export class XMLscene extends CGFscene {
 
     this.initCameras();
 
+    this.initShaders();
+
     this.interface.lightsConfig();
 
     this.interface.camerasConfig();
+
+    this.interface.highlightConfig();
 
     this.sceneInited = true;
 
@@ -169,24 +251,26 @@ export class XMLscene extends CGFscene {
     console.log("Lights updated");
   }
 
-  update(time){
-
-    if(this.startTime == null){
+  update(time) {
+    if (this.startTime == null) {
       this.startTime = time;
     }
 
     //Update animations on each component of the scene
-    for(let key in this.graph.components){
-      if(this.graph.components[key].animation!=null){
-        this.graph.components[key].animation.update((time - this.startTime));
+    for (let key in this.graph.components) {
+      if (this.graph.components[key].animation != null) {
+        this.graph.components[key].animation.update(time - this.startTime);
       }
     }
-    
+
+    this.testShaders[1].setUniformsValues({
+      timeFactor: (time / 100) % 100,
+    });
   }
 
   /**
    * Displays the scene.
-   */ 
+   */
   display() {
     // ---- BEGIN Background, camera and axis setup
 
@@ -204,7 +288,9 @@ export class XMLscene extends CGFscene {
 
     this.pushMatrix();
 
-    
+    this.setActiveShader(this.testShaders[this.selectedExampleShader]);
+    this.graph.textures["barrel"].bind(0);
+
     // Draw axis
     if (this.displayAxis) {
       this.axis.display();
@@ -219,7 +305,6 @@ export class XMLscene extends CGFscene {
     const root = this.graph.components[idRoot];
     this.drawComponent(root, null, null);
 
-
     this.popMatrix();
     // ---- END Background, camera and axis setup
   }
@@ -233,7 +318,7 @@ export class XMLscene extends CGFscene {
     if (component.transformation != undefined)
       this.multMatrix(component.transformation);
 
-    if(component.animation!=null){
+    if (component.animation != null) {
       this.multMatrix(component.animation.apply());
     }
     const currentComponentId =
@@ -265,15 +350,15 @@ export class XMLscene extends CGFscene {
     }
 
     let textParent = {
-      'id': textureId,
-      'length_s': length_s,
-      'length_t': length_t
-    }
+      id: textureId,
+      length_s: length_s,
+      length_t: length_t,
+    };
 
     for (let i = 0; i < component.children.length; i++) {
       this.pushMatrix();
 
-      this.drawComponent(component.children[i], appearenceId, textParent );
+      this.drawComponent(component.children[i], appearenceId, textParent);
 
       this.popMatrix();
     }
@@ -293,11 +378,28 @@ export class XMLscene extends CGFscene {
       this.gl.TEXTURE_WRAP_T,
       this.gl.REPEAT
     );
+
+    if (component.highlighted != undefined) {
+      if (component.isHighlighted == true) {
+        this.setActiveShader(this.testShaders[1]);
+        this.testShaders[1].setUniformsValues({
+          red: component.highlighted.r,
+          green: component.highlighted.g,
+          blue: component.highlighted.b,
+          normScale: component.highlighted.scale_h,
+        });
+      }
+    }
+
     currentApperence.apply();
 
     for (let j = 0; j < component.primitives.length; j++) {
       component.primitives[j].updateTexCoords(length_s, length_t);
       component.primitives[j].display();
+    }
+
+    if (component.highlighted != undefined) {
+      this.setActiveShader(this.testShaders[0]);
     }
   }
 }

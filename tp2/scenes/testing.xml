@@ -227,6 +227,7 @@
                 <primitiveref id="halfLid" />
                 <componentref id="otherHalfLid" />
             </children>
+            <highlighted r="1.0" g="0.5" b="0.5" scale_h="2" />
         </component>
 
         <component id="barrelLidTop">
@@ -267,6 +268,20 @@
                 <componentref id="barrelBody" />
                 <componentref id="barrelLidBottom" />
                 <componentref id="barrelLidTop" />
+            </children>
+            
+        </component>
+
+        <component id="lantern2">
+            <transformation>
+                <translate x='0' y='5' z='0'/>
+            </transformation>
+            <materials>
+                <material id="demoMaterial2"/>
+            </materials>
+            <texture id="none"/>
+            <children>
+                <primitiveref id="demoSphere"/>
             </children>
         </component>
 

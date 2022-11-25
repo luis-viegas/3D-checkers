@@ -394,7 +394,6 @@ export class MySceneGraph {
    * @param {lights block element} lightsNode
    */
   parseLights(lightsNode) {
-    
     var children = lightsNode.children;
 
     this.lights = [];
@@ -456,7 +455,9 @@ export class MySceneGraph {
       for (var j = 0; j < attributeNames.length; j++) {
         var attributeIndex = nodeNames.indexOf(attributeNames[j]);
 
-        if(attributeNames[j] == "attenuation"){continue}
+        if (attributeNames[j] == "attenuation") {
+          continue;
+        }
 
         if (attributeIndex != -1) {
           if (attributeTypes[j] == "position")
@@ -490,15 +491,13 @@ export class MySceneGraph {
 
         if (constant == null || linear == null || quadratic == null)
           return "no attenuation defined for light";
-          
+
         attenuation = [constant, linear, quadratic];
-        if(attenuation[0] == 0 && attenuation[1] == 0 && attenuation[2] == 0)
+        if (attenuation[0] == 0 && attenuation[1] == 0 && attenuation[2] == 0)
           return "attenuation must be different from 0";
-        
       }
 
       global.push(attenuation);
-
 
       // Gets the additional attributes of the spot light
       if (children[i].nodeName == "spot") {
@@ -523,7 +522,7 @@ export class MySceneGraph {
 
           targetLight = aux;
         } else return "light target undefined for ID = " + lightId;
-          
+
         global.push(...[angle, exponent, targetLight]);
       }
 
@@ -827,7 +826,7 @@ export class MySceneGraph {
           grandChildren[0].nodeName != "cylinder" &&
           grandChildren[0].nodeName != "sphere" &&
           grandChildren[0].nodeName != "torus" &&
-        grandChildren[0].nodeName != "patch")
+          grandChildren[0].nodeName != "patch")
       ) {
         return "There must be exactly 1 primitive type (rectangle, triangle, cylinder, sphere or torus)";
       }
@@ -1006,39 +1005,48 @@ export class MySceneGraph {
           loops
         );
         this.primitives[primitiveId] = torus;
-      } else if( primitiveType == "patch"){
+      } else if (primitiveType == "patch") {
         let degree_u = this.reader.getInteger(grandChildren[0], "degree_u");
         let degree_v = this.reader.getInteger(grandChildren[0], "degree_v");
         let parts_u = this.reader.getInteger(grandChildren[0], "parts_u");
         let parts_v = this.reader.getInteger(grandChildren[0], "parts_v");
         let controlPoints = [];
 
-        if(degree_u < 1 || degree_v < 1 || parts_u < 1 || parts_v < 1){
+        if (degree_u < 1 || degree_v < 1 || parts_u < 1 || parts_v < 1) {
           return "Invalid patch parameters";
         }
 
         let controlPointsNode = grandChildren[0].children;
-        if(grandChildren[0].children.length != (degree_u + 1) * (degree_v + 1)){
+        if (
+          grandChildren[0].children.length !=
+          (degree_u + 1) * (degree_v + 1)
+        ) {
           return "Invalid number of control points";
         }
 
-        for(let i = 0; i < controlPointsNode.length; i++){
+        for (let i = 0; i < controlPointsNode.length; i++) {
           let x = this.reader.getFloat(controlPointsNode[i], "x");
           let y = this.reader.getFloat(controlPointsNode[i], "y");
           let z = this.reader.getFloat(controlPointsNode[i], "z");
 
-          if(x == null || y == null || z == null){
+          if (x == null || y == null || z == null) {
             return "Invalid control point";
           }
 
-          controlPoints.push([x, y, z,1]);
+          controlPoints.push([x, y, z, 1]);
         }
 
-        let patch = new MyPatch(this.scene, primitiveId, degree_u, degree_v, parts_u, parts_v, controlPoints);
+        let patch = new MyPatch(
+          this.scene,
+          primitiveId,
+          degree_u,
+          degree_v,
+          parts_u,
+          parts_v,
+          controlPoints
+        );
         this.primitives[primitiveId] = patch;
-
-      }
-       else {
+      } else {
         console.warn("To do: Parse other primitives.");
       }
     }
@@ -1051,7 +1059,7 @@ export class MySceneGraph {
    * Parses the <animations> block.
    * @param {animations node element} animationsNode
    * @returns {null} or a string in case of error
-    */
+   */
   parseAnimations(animationsNode) {
     let children = animationsNode.children;
     this.animations = [];
@@ -1064,9 +1072,7 @@ export class MySceneGraph {
       let keyframes = [];
       //if nodeName is different from keyframeanim, its an error
       if (children[i].nodeName != "keyframeanim") {
-        this.onXMLMinorError(
-          "unknown tag <" + children[i].nodeName + ">"
-        );
+        this.onXMLMinorError("unknown tag <" + children[i].nodeName + ">");
         continue;
       }
 
@@ -1074,14 +1080,18 @@ export class MySceneGraph {
       if (animationId == null) return "no ID defined for animation";
 
       if (this.animations[animationId] != null)
-        return "ID must be unique for each animation (conflict: ID = " + animationId + ")";
+        return (
+          "ID must be unique for each animation (conflict: ID = " +
+          animationId +
+          ")"
+        );
 
       grandChildren = children[i].children;
 
       //Goes through all keyframes
       for (let j = 0; j < grandChildren.length; j++) {
         let keyframe = {};
-        if(grandChildren[j].nodeName != "keyframe"){
+        if (grandChildren[j].nodeName != "keyframe") {
           this.onXMLMinorError(
             "unknown tag <" + grandChildren[j].nodeName + ">"
           );
@@ -1089,11 +1099,12 @@ export class MySceneGraph {
         }
 
         let instant = this.reader.getFloat(grandChildren[j], "instant");
-        if(instant == null) return "no instant defined for keyframe";
+        if (instant == null) return "no instant defined for keyframe";
         keyframe.instant = instant * 1000;
 
         let transformations = grandChildren[j].children;
-        if(transformations.length != 5) return "keyframe must have exactly 5 transformations";
+        if (transformations.length != 5)
+          return "keyframe must have exactly 5 transformations";
 
         let translation = transformations[0];
         let rotationZ = transformations[1];
@@ -1101,62 +1112,67 @@ export class MySceneGraph {
         let rotationX = transformations[3];
         let scale = transformations[4];
 
-        if(translation.nodeName != "translation" || rotationZ.nodeName != "rotation" || rotationY.nodeName != "rotation" || rotationX.nodeName != "rotation" || scale.nodeName != "scale"){
+        if (
+          translation.nodeName != "translation" ||
+          rotationZ.nodeName != "rotation" ||
+          rotationY.nodeName != "rotation" ||
+          rotationX.nodeName != "rotation" ||
+          scale.nodeName != "scale"
+        ) {
           return "keyframe must have exactly 5 transformations";
         }
 
         let translationX = this.reader.getFloat(translation, "x");
-        if(translationX == null) return "no x defined for translation";
+        if (translationX == null) return "no x defined for translation";
         let translationY = this.reader.getFloat(translation, "y");
-        if(translationY == null) return "no y defined for translation";
+        if (translationY == null) return "no y defined for translation";
         let translationZ = this.reader.getFloat(translation, "z");
-        if(translationZ == null) return "no z defined for translation";
+        if (translationZ == null) return "no z defined for translation";
 
         keyframe.translation = [translationX, translationY, translationZ];
 
         let rotationZAxis = this.reader.getString(rotationZ, "axis");
-        if(rotationZAxis == null) return "no axis defined for rotationZ";
-        if(rotationZAxis != "z") return "invalid axis for rotationZ";
+        if (rotationZAxis == null) return "no axis defined for rotationZ";
+        if (rotationZAxis != "z") return "invalid axis for rotationZ";
         let rotationZAngle = this.reader.getFloat(rotationZ, "angle");
-        if(rotationZAngle == null) return "no angle defined for rotationZ";
+        if (rotationZAngle == null) return "no angle defined for rotationZ";
 
         let rotationYAxis = this.reader.getString(rotationY, "axis");
-        if(rotationYAxis == null) return "no axis defined for rotationY";
-        if(rotationYAxis != "y") return "invalid axis for rotationY";
+        if (rotationYAxis == null) return "no axis defined for rotationY";
+        if (rotationYAxis != "y") return "invalid axis for rotationY";
         let rotationYAngle = this.reader.getFloat(rotationY, "angle");
-        if(rotationYAngle == null) return "no angle defined for rotationY";
-        
+        if (rotationYAngle == null) return "no angle defined for rotationY";
+
         let rotationXAxis = this.reader.getString(rotationX, "axis");
-        if(rotationXAxis == null) return "no axis defined for rotationX";
-        if(rotationXAxis != "x") return "invalid axis for rotationX";
+        if (rotationXAxis == null) return "no axis defined for rotationX";
+        if (rotationXAxis != "x") return "invalid axis for rotationX";
         let rotationXAngle = this.reader.getFloat(rotationX, "angle");
-        if(rotationXAngle == null) return "no angle defined for rotationX";
+        if (rotationXAngle == null) return "no angle defined for rotationX";
 
         keyframe.rotation = [DEGREE_TO_RAD* rotationXAngle, DEGREE_TO_RAD* rotationYAngle, DEGREE_TO_RAD* rotationZAngle];
 
         let scaleX = this.reader.getFloat(scale, "sx");
-        if(scaleX == null) return "no x defined for scale";
+        if (scaleX == null) return "no x defined for scale";
         let scaleY = this.reader.getFloat(scale, "sy");
-        if(scaleY == null) return "no y defined for scale";
+        if (scaleY == null) return "no y defined for scale";
         let scaleZ = this.reader.getFloat(scale, "sz");
-        if(scaleZ == null) return "no z defined for scale";
-        
+        if (scaleZ == null) return "no z defined for scale";
+
         keyframe.scale = [scaleX, scaleY, scaleZ];
 
         //if this keyframe is the first one, create startPosition as all the transformations as default
         keyframes.push(keyframe);
-
       }
-      
-      let animation = new MyKeyframeAnimation(this.scene, animationId, keyframes);
+
+      let animation = new MyKeyframeAnimation(
+        this.scene,
+        animationId,
+        keyframes
+      );
       this.animations[animationId] = animation;
-  
     }
 
-    console.log(this.animations)
-
-
-
+    console.log(this.animations);
   }
 
   /**
@@ -1214,26 +1230,28 @@ export class MySceneGraph {
       let highlightedIndex = nodeNames.indexOf("highlighted");
       let animationIndex = nodeNames.indexOf("animation");
 
-      let highlighted = highlightedIndex != -1 ? grandChildren[highlightedIndex] : null;
-      let animation = animationIndex != -1 ? grandChildren[animationIndex] : null;
+      let highlighted =
+        highlightedIndex != -1 ? grandChildren[highlightedIndex] : null;
+      let animation =
+        animationIndex != -1 ? grandChildren[animationIndex] : null;
 
-      if(animation != null){
+      if (animation != null) {
         let animationId = this.reader.getString(animation, "id");
-        if(animationId == null) return "no id defined for animation";
-        if(this.animations[animationId] == null) return "animation with id " + animationId + " does not exist";
+        if (animationId == null) return "no id defined for animation";
+        if (this.animations[animationId] == null)
+          return "animation with id " + animationId + " does not exist";
         this.components[componentID].animation = this.animations[animationId];
-      }
-      else{
+      } else {
         this.components[componentID].animation = null;
       }
 
-      if(highlighted != null){
+      if (highlighted != null) {
         let r = this.reader.getFloat(highlighted, "r");
         let g = this.reader.getFloat(highlighted, "g");
         let b = this.reader.getFloat(highlighted, "b");
         let scale_h = this.reader.getFloat(highlighted, "scale_h");
 
-        if(r == null || g == null || b == null || scale_h == null){
+        if (r == null || g == null || b == null || scale_h == null) {
           return "Invalid highlighted component";
         }
 
@@ -1241,10 +1259,10 @@ export class MySceneGraph {
           r: r,
           g: g,
           b: b,
-          scale_h: scale_h
-        }
-      }
-      else{
+          scale_h: scale_h,
+        };
+        this.components[componentID].isHighlighted = true;
+      } else {
         this.components[componentID].highlighted = null;
       }
       // Transformations
@@ -1343,7 +1361,6 @@ export class MySceneGraph {
       this.components[componentID].children = childrenComponents.children;
       this.components[componentID].primitives = childrenComponents.primitives;
     }
-
   }
 
   /**
