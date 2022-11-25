@@ -146,6 +146,33 @@
         </primitive>
     </primitives>
 
+    <animations>
+        <keyframeanim id="animation1">
+            <keyframe instant="5">
+                <translation x="0" y="0" z="0"/>
+                <rotation axis="z" angle="0"/>
+                <rotation axis="y" angle="0"/>
+                <rotation axis="x" angle="0"/>
+                <scale sx="1" sy="1" sz="1"/>
+            </keyframe>
+            <keyframe instant="10">
+                <translation x="0" y="0" z="0"/>
+                <rotation axis="z" angle="0"/>
+                <rotation axis="y" angle="0"/>
+                <rotation axis="x" angle="0"/>
+                <scale sx="1" sy="1" sz="1"/>
+            </keyframe>
+            <keyframe instant="60">
+                <translation x="0" y="3" z="0"/>
+                <rotation axis="z" angle="0"/>
+                <rotation axis="y" angle="0"/>
+                <rotation axis="x" angle="0"/>
+                <scale sx="1.5" sy="1" sz="1"/>
+            </keyframe>
+        </keyframeanim>
+    </animations>
+
+
     <components>
         <component id="otherHalfBarrelBody">
             <transformation>
@@ -228,6 +255,7 @@
         <component id="demoRoot">
             <transformation>
             </transformation>
+            <animation id="animation1" />
             <materials>
                 <material id="demoMaterial" />
             </materials>

@@ -34,7 +34,7 @@ export class XMLscene extends CGFscene {
     this.gl.depthFunc(this.gl.LEQUAL);
 
     this.axis = new CGFaxis(this);
-    this.setUpdatePeriod(100);
+    this.setUpdatePeriod(1000);
     //This variable allows to change between materials pressing the button m/M
     this.currentMaterial = 0;
 
@@ -88,14 +88,24 @@ export class XMLscene extends CGFscene {
           light[5][3]
         );
 
+        this.lights[i].setConstantAttenuation(light[6][0]);
+        this.lights[i].setLinearAttenuation(light[6][1]);
+        this.lights[i].setQuadraticAttenuation(light[6][2]);
+
+
         if (light[1] == "spot") {
-          this.lights[i].setSpotCutOff(light[6]);
-          this.lights[i].setSpotExponent(light[7]);
-          this.lights[i].setSpotDirection(
-            light[8][0],
-            light[8][1],
-            light[8][2]
-          );
+          this.lights[i].setSpotCutOff(light[7]);
+          this.lights[i].setSpotExponent(light[8]);
+
+          let location = light[2];
+          let target = light[9];
+          // Substract the target from the location to get the direction
+          let direction = [location[0] - target[0], location[1] - target[1], location[2] - target[2]];
+          //Normalize the direction vector
+          let magnitude = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2]);
+          direction = [direction[0] / magnitude, direction[1] / magnitude, direction[2] / magnitude];
+          this.lights[i].setSpotDirection(direction[0], direction[1], direction[2]);
+          
         }
 
         this.lights[i].setVisible(true);
@@ -139,6 +149,10 @@ export class XMLscene extends CGFscene {
     this.interface.camerasConfig();
 
     this.sceneInited = true;
+
+    this.setUpdatePeriod(10);
+
+    this.startTime = null;
   }
 
   //Handler of m key press
@@ -153,6 +167,21 @@ export class XMLscene extends CGFscene {
   updateLights(id) {
     this.lights[id].update();
     console.log("Lights updated");
+  }
+
+  update(time){
+
+    if(this.startTime == null){
+      this.startTime = time;
+    }
+
+    //Update animations on each component of the scene
+    for(let key in this.graph.components){
+      if(this.graph.components[key].animation!=null){
+        this.graph.components[key].animation.update((time - this.startTime));
+      }
+    }
+    
   }
 
   /**
@@ -204,6 +233,9 @@ export class XMLscene extends CGFscene {
     if (component.transformation != undefined)
       this.multMatrix(component.transformation);
 
+    if(component.animation!=null){
+      this.multMatrix(component.animation.apply());
+    }
     const currentComponentId =
       this.currentMaterial % component.materials.length;
 

@@ -11,6 +11,7 @@ import { MyTriangle } from "./MyTriangle.js";
 import { MySphere } from "./MySphere.js";
 import { MyTorus } from "./MyTorus.js";
 import { MyPatch } from "./MyPatch.js";
+import { MyKeyframeAnimation } from "./MyKeyframeAnimation.js";
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -23,7 +24,8 @@ var TEXTURES_INDEX = 4;
 var MATERIALS_INDEX = 5;
 var TRANSFORMATIONS_INDEX = 6;
 var PRIMITIVES_INDEX = 7;
-var COMPONENTS_INDEX = 8;
+var ANIMATIONS_INDEX = 8;
+var COMPONENTS_INDEX = 9;
 
 /**
  * MySceneGraph class, representing the scene graph.
@@ -187,6 +189,17 @@ export class MySceneGraph {
 
       //Parse primitives block
       if ((error = this.parsePrimitives(nodes[index])) != null) return error;
+    }
+
+    // <animations>
+    if ((index = nodeNames.indexOf("animations")) == -1)
+      return "tag <animations> missing";
+    else {
+      if (index != ANIMATIONS_INDEX)
+        this.onXMLMinorError("tag <animations> out of order");
+
+      //Parse primitives block
+      if ((error = this.parseAnimations(nodes[index])) != null) return error;
     }
 
     // <components>
@@ -381,8 +394,6 @@ export class MySceneGraph {
    * @param {lights block element} lightsNode
    */
   parseLights(lightsNode) {
-    //TODO parse light atenuatuion
-    //TODO correct light direction
     
     var children = lightsNode.children;
 
@@ -445,6 +456,8 @@ export class MySceneGraph {
       for (var j = 0; j < attributeNames.length; j++) {
         var attributeIndex = nodeNames.indexOf(attributeNames[j]);
 
+        if(attributeNames[j] == "attenuation"){continue}
+
         if (attributeIndex != -1) {
           if (attributeTypes[j] == "position")
             var aux = this.parseCoordinates4D(
@@ -465,6 +478,27 @@ export class MySceneGraph {
             "light " + attributeNames[i] + " undefined for ID = " + lightId
           );
       }
+
+      let attenuationIndex = nodeNames.indexOf("attenuation");
+      let attenuation = [1.0, 0.0, 0.0];
+
+      if (attenuationIndex != -1) {
+        let atten = grandChildren[attenuationIndex];
+        let constant = this.reader.getFloat(atten, "constant");
+        let linear = this.reader.getFloat(atten, "linear");
+        let quadratic = this.reader.getFloat(atten, "quadratic");
+
+        if (constant == null || linear == null || quadratic == null)
+          return "no attenuation defined for light";
+          
+        attenuation = [constant, linear, quadratic];
+        if(attenuation[0] == 0 && attenuation[1] == 0 && attenuation[2] == 0)
+          return "attenuation must be different from 0";
+        
+      }
+
+      global.push(attenuation);
+
 
       // Gets the additional attributes of the spot light
       if (children[i].nodeName == "spot") {
@@ -489,7 +523,7 @@ export class MySceneGraph {
 
           targetLight = aux;
         } else return "light target undefined for ID = " + lightId;
-
+          
         global.push(...[angle, exponent, targetLight]);
       }
 
@@ -1014,6 +1048,118 @@ export class MySceneGraph {
   }
 
   /**
+   * Parses the <animations> block.
+   * @param {animations node element} animationsNode
+   * @returns {null} or a string in case of error
+    */
+  parseAnimations(animationsNode) {
+    let children = animationsNode.children;
+    this.animations = [];
+    let totalTime = 0;
+    //For each keyframe
+    let grandChildren = [];
+
+    //Goes thorugh all animations
+    for (let i = 0; i < children.length; i++) {
+      let keyframes = [];
+      //if nodeName is different from keyframeanim, its an error
+      if (children[i].nodeName != "keyframeanim") {
+        this.onXMLMinorError(
+          "unknown tag <" + children[i].nodeName + ">"
+        );
+        continue;
+      }
+
+      let animationId = this.reader.getString(children[i], "id");
+      if (animationId == null) return "no ID defined for animation";
+
+      if (this.animations[animationId] != null)
+        return "ID must be unique for each animation (conflict: ID = " + animationId + ")";
+
+      grandChildren = children[i].children;
+
+      //Goes through all keyframes
+      for (let j = 0; j < grandChildren.length; j++) {
+        let keyframe = {};
+        if(grandChildren[j].nodeName != "keyframe"){
+          this.onXMLMinorError(
+            "unknown tag <" + grandChildren[j].nodeName + ">"
+          );
+          continue;
+        }
+
+        let instant = this.reader.getFloat(grandChildren[j], "instant");
+        if(instant == null) return "no instant defined for keyframe";
+        keyframe.instant = instant * 1000;
+
+        let transformations = grandChildren[j].children;
+        if(transformations.length != 5) return "keyframe must have exactly 5 transformations";
+
+        let translation = transformations[0];
+        let rotationZ = transformations[1];
+        let rotationY = transformations[2];
+        let rotationX = transformations[3];
+        let scale = transformations[4];
+
+        if(translation.nodeName != "translation" || rotationZ.nodeName != "rotation" || rotationY.nodeName != "rotation" || rotationX.nodeName != "rotation" || scale.nodeName != "scale"){
+          return "keyframe must have exactly 5 transformations";
+        }
+
+        let translationX = this.reader.getFloat(translation, "x");
+        if(translationX == null) return "no x defined for translation";
+        let translationY = this.reader.getFloat(translation, "y");
+        if(translationY == null) return "no y defined for translation";
+        let translationZ = this.reader.getFloat(translation, "z");
+        if(translationZ == null) return "no z defined for translation";
+
+        keyframe.translation = [translationX, translationY, translationZ];
+
+        let rotationZAxis = this.reader.getString(rotationZ, "axis");
+        if(rotationZAxis == null) return "no axis defined for rotationZ";
+        if(rotationZAxis != "z") return "invalid axis for rotationZ";
+        let rotationZAngle = this.reader.getFloat(rotationZ, "angle");
+        if(rotationZAngle == null) return "no angle defined for rotationZ";
+
+        let rotationYAxis = this.reader.getString(rotationY, "axis");
+        if(rotationYAxis == null) return "no axis defined for rotationY";
+        if(rotationYAxis != "y") return "invalid axis for rotationY";
+        let rotationYAngle = this.reader.getFloat(rotationY, "angle");
+        if(rotationYAngle == null) return "no angle defined for rotationY";
+        
+        let rotationXAxis = this.reader.getString(rotationX, "axis");
+        if(rotationXAxis == null) return "no axis defined for rotationX";
+        if(rotationXAxis != "x") return "invalid axis for rotationX";
+        let rotationXAngle = this.reader.getFloat(rotationX, "angle");
+        if(rotationXAngle == null) return "no angle defined for rotationX";
+
+        keyframe.rotation = [rotationXAngle, rotationYAngle, rotationZAngle];
+
+        let scaleX = this.reader.getFloat(scale, "sx");
+        if(scaleX == null) return "no x defined for scale";
+        let scaleY = this.reader.getFloat(scale, "sy");
+        if(scaleY == null) return "no y defined for scale";
+        let scaleZ = this.reader.getFloat(scale, "sz");
+        if(scaleZ == null) return "no z defined for scale";
+        
+        keyframe.scale = [scaleX, scaleY, scaleZ];
+
+        //if this keyframe is the first one, create startPosition as all the transformations as default
+        keyframes.push(keyframe);
+
+      }
+      
+      let animation = new MyKeyframeAnimation(this.scene, animationId, keyframes);
+      this.animations[animationId] = animation;
+  
+    }
+
+    console.log(this.animations)
+
+
+
+  }
+
+  /**
    * Component Element shall be:
    * components.id ->
    *  - transformation
@@ -1066,8 +1212,20 @@ export class MySceneGraph {
       var textureIndex = nodeNames.indexOf("texture");
       var childrenIndex = nodeNames.indexOf("children");
       let highlightedIndex = nodeNames.indexOf("highlighted");
+      let animationIndex = nodeNames.indexOf("animation");
 
       let highlighted = highlightedIndex != -1 ? grandChildren[highlightedIndex] : null;
+      let animation = animationIndex != -1 ? grandChildren[animationIndex] : null;
+
+      if(animation != null){
+        let animationId = this.reader.getString(animation, "id");
+        if(animationId == null) return "no id defined for animation";
+        if(this.animations[animationId] == null) return "animation with id " + animationId + " does not exist";
+        this.components[componentID].animation = this.animations[animationId];
+      }
+      else{
+        this.components[componentID].animation = null;
+      }
 
       if(highlighted != null){
         let r = this.reader.getFloat(highlighted, "r");
