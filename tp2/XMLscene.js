@@ -155,6 +155,7 @@ export class XMLscene extends CGFscene {
     */
 
     this.testShaders = [
+      new CGFshader(this.gl, "shaders/texture1.vert", "shaders/texture1.frag"),
       new CGFshader(
         this.gl,
         "shaders/texture3anim.vert",
@@ -162,8 +163,15 @@ export class XMLscene extends CGFscene {
       ),
     ];
 
-    this.testShaders[0].setUniformsValues({ uSampler2: 1 });
-    this.testShaders[0].setUniformsValues({ timeFactor: 0 });
+    this.testShaders[1].setUniformsValues({ uSampler2: 1 });
+    this.testShaders[1].setUniformsValues({
+      timeFactor: 0,
+      red: 1.0,
+      green: 1.0,
+      blue: 1.0,
+    });
+
+    console.log("grafooo", this.graph);
 
     // additional texture will have to be bound to texture unit 1 later, when using the shader, with "this.texture2.bind(1);"
   }
@@ -220,7 +228,7 @@ export class XMLscene extends CGFscene {
     // Dividing the time by 100 "slows down" the variation (i.e. in 100 ms timeFactor increases 1 unit).
     // Doing the modulus (%) by 100 makes the timeFactor loop between 0 and 99
     // ( so the loop period of timeFactor is 100 times 100 ms = 10s ; the actual animation loop depends on how timeFactor is used in the shader )
-    this.testShaders[0].setUniformsValues({
+    this.testShaders[1].setUniformsValues({
       timeFactor: (t / 250) % 100,
     });
   }
@@ -247,9 +255,6 @@ export class XMLscene extends CGFscene {
 
     this.setActiveShader(this.testShaders[this.selectedExampleShader]);
     this.graph.textures["barrel"].bind(0);
-    this.testShaders[this.selectedExampleShader].setUniformsValues({
-      normScale: Math.sin(this.scaleFactor),
-    });
 
     // Draw axis
     if (this.displayAxis) {
@@ -275,6 +280,16 @@ export class XMLscene extends CGFscene {
    * @param {object} component
    */
   drawComponent(component, previousAppId, previousTex) {
+    if (component.highlighted != undefined) {
+      this.setActiveShader(this.testShaders[1]);
+      this.testShaders[1].setUniformsValues({
+        red: component.highlighted.r,
+        green: component.highlighted.g,
+        blue: component.highlighted.b,
+        normScale: component.highlighted.scale_h,
+      });
+    }
+
     if (component.transformation != undefined)
       this.multMatrix(component.transformation);
 
@@ -340,6 +355,10 @@ export class XMLscene extends CGFscene {
     for (let j = 0; j < component.primitives.length; j++) {
       component.primitives[j].updateTexCoords(length_s, length_t);
       component.primitives[j].display();
+    }
+
+    if (component.highlighted != undefined) {
+      this.setActiveShader(this.testShaders[0]);
     }
   }
 }

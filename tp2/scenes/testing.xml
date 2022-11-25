@@ -1,7 +1,7 @@
 <sxs>
     <scene root="demoRoot" axis_length="5"/>
 
-    <views default="defaultCamera">
+    <views default="defaultCamera2">
         <perspective id="defaultCamera" near="0.1" far="5" angle="45">
             <from x="0" y="1" z="5" />
             <to x="0" y="1" z="0" />
@@ -223,6 +223,20 @@
                 <componentref id="barrelLidBottom" />
                 <componentref id="barrelLidTop" />
             </children>
+            <highlighted r="1.0" g="0.5" b="0.5" scale_h="2" />
+        </component>
+
+        <component id="lantern2">
+            <transformation>
+                <translate x='0' y='5' z='0'/>
+            </transformation>
+            <materials>
+                <material id="demoMaterial2"/>
+            </materials>
+            <texture id="none"/>
+            <children>
+                <primitiveref id="demoSphere"/>
+            </children>
         </component>
 
         <component id="demoRoot">
@@ -234,6 +248,7 @@
             <texture id="none"/>
             <children>
                 <componentref id="barrel" />
+                <componentref id="lantern2" />
             </children>
         </component>
     </components>
