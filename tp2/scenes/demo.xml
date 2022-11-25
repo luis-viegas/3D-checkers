@@ -399,6 +399,7 @@
             <children>
                 <primitiveref id="demoSphere" />
             </children>
+            <highlighted r="0.3" g="0.5" b="0.5" scale_h="3" />
         </component>
         <component id="ground">
             <transformation>
@@ -440,6 +441,7 @@
             <children>
                 <primitiveref id="cherryStick"/>
             </children>
+            <highlighted r="1" g="0" b="0" scale_h="3" />
         </component>
         <component id="cherry">
             <transformation>

@@ -263,9 +263,11 @@ export class XMLscene extends CGFscene {
       }
     }
 
-    this.testShaders[1].setUniformsValues({
-      timeFactor: (time / 100) % 100,
-    });
+    if(this.testShaders!=undefined){
+      this.testShaders[1].setUniformsValues({
+        timeFactor: (time / 100) % 100,
+      });
+    }
   }
 
   /**
@@ -287,10 +289,9 @@ export class XMLscene extends CGFscene {
     this.applyViewMatrix();
 
     this.pushMatrix();
-    /*
-    this.setActiveShader(this.testShaders[this.selectedExampleShader]);
-    this.graph.textures["barrel"].bind(0);
-    */
+    
+    this.setActiveShader(this.defaultShader);
+  
     // Draw axis
     if (this.displayAxis) {
       this.axis.display();
@@ -368,16 +369,19 @@ export class XMLscene extends CGFscene {
     let currentApperence = this.graph.appearences[appearenceId];
 
     currentApperence.setTexture(currTexture);
-    this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
-      this.gl.TEXTURE_WRAP_S,
-      this.gl.REPEAT
-    );
-    this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
-      this.gl.TEXTURE_WRAP_T,
-      this.gl.REPEAT
-    );
+
+    if(currTexture!=null){
+      this.gl.texParameteri(
+        this.gl.TEXTURE_2D,
+        this.gl.TEXTURE_WRAP_S,
+        this.gl.REPEAT
+      );
+      this.gl.texParameteri(
+        this.gl.TEXTURE_2D,
+        this.gl.TEXTURE_WRAP_T,
+        this.gl.REPEAT
+      );
+    }
 
     
     if (component.highlighted != undefined) {

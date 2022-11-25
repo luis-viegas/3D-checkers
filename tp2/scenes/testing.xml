@@ -13,7 +13,7 @@
     </views>
 
     <ambient>
-        <ambient r="1" g="1" b="1" a="1.0" />
+        <ambient r="0.1" g="0.1" b="0.1" a="1.0" />
         <background r="0.0" g="0.0" b="0.0" a="1.0" />
     </ambient>
 
@@ -172,7 +172,7 @@
         </keyframeanim>
 
          <keyframeanim id="animation2">
-            <keyframe instant="5">
+            <keyframe instant="0">
                 <translation x="0" y="0" z="0"/>
                 <rotation axis="z" angle="0"/>
                 <rotation axis="y" angle="0"/>
@@ -180,10 +180,10 @@
                 <scale sx="1" sy="1" sz="1"/>
             </keyframe>
 
-            <keyframe instant="120">
+            <keyframe instant="1000">
                 <translation x="0" y="0" z="0"/>
                 <rotation axis="z" angle="0"/>
-                <rotation axis="y" angle="45"/>
+                <rotation axis="y" angle="1200"/>
                 <rotation axis="x" angle="0"/>
                 <scale sx="1" sy="1" sz="1"/>
             </keyframe>
@@ -227,7 +227,6 @@
                 <primitiveref id="halfLid" />
                 <componentref id="otherHalfLid" />
             </children>
-            <highlighted r="1.0" g="0.5" b="0.5" scale_h="2" />
         </component>
 
         <component id="barrelLidTop">
@@ -317,13 +316,15 @@
 
         <component id="demoRoot">
             <transformation>
+                <scale x="0.5" y="0.5" z="0.5" />
             </transformation>
             <materials>
                 <material id="demoMaterial" />
             </materials>
+            <animation id="animation2" />
             <texture id="none"/>
             <children>
-                <componentref id="barrels" />
+                <componentref id="barrel"/>
             </children>
         </component>
     </components>
