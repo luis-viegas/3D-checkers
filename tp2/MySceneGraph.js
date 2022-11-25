@@ -383,7 +383,7 @@ export class MySceneGraph {
   parseLights(lightsNode) {
     //TODO parse light atenuatuion
     //TODO correct light direction
-    
+
     var children = lightsNode.children;
 
     this.lights = [];
@@ -793,7 +793,7 @@ export class MySceneGraph {
           grandChildren[0].nodeName != "cylinder" &&
           grandChildren[0].nodeName != "sphere" &&
           grandChildren[0].nodeName != "torus" &&
-        grandChildren[0].nodeName != "patch")
+          grandChildren[0].nodeName != "patch")
       ) {
         return "There must be exactly 1 primitive type (rectangle, triangle, cylinder, sphere or torus)";
       }
@@ -972,39 +972,48 @@ export class MySceneGraph {
           loops
         );
         this.primitives[primitiveId] = torus;
-      } else if( primitiveType == "patch"){
+      } else if (primitiveType == "patch") {
         let degree_u = this.reader.getInteger(grandChildren[0], "degree_u");
         let degree_v = this.reader.getInteger(grandChildren[0], "degree_v");
         let parts_u = this.reader.getInteger(grandChildren[0], "parts_u");
         let parts_v = this.reader.getInteger(grandChildren[0], "parts_v");
         let controlPoints = [];
 
-        if(degree_u < 1 || degree_v < 1 || parts_u < 1 || parts_v < 1){
+        if (degree_u < 1 || degree_v < 1 || parts_u < 1 || parts_v < 1) {
           return "Invalid patch parameters";
         }
 
         let controlPointsNode = grandChildren[0].children;
-        if(grandChildren[0].children.length != (degree_u + 1) * (degree_v + 1)){
+        if (
+          grandChildren[0].children.length !=
+          (degree_u + 1) * (degree_v + 1)
+        ) {
           return "Invalid number of control points";
         }
 
-        for(let i = 0; i < controlPointsNode.length; i++){
+        for (let i = 0; i < controlPointsNode.length; i++) {
           let x = this.reader.getFloat(controlPointsNode[i], "x");
           let y = this.reader.getFloat(controlPointsNode[i], "y");
           let z = this.reader.getFloat(controlPointsNode[i], "z");
 
-          if(x == null || y == null || z == null){
+          if (x == null || y == null || z == null) {
             return "Invalid control point";
           }
 
-          controlPoints.push([x, y, z,1]);
+          controlPoints.push([x, y, z, 1]);
         }
 
-        let patch = new MyPatch(this.scene, primitiveId, degree_u, degree_v, parts_u, parts_v, controlPoints);
+        let patch = new MyPatch(
+          this.scene,
+          primitiveId,
+          degree_u,
+          degree_v,
+          parts_u,
+          parts_v,
+          controlPoints
+        );
         this.primitives[primitiveId] = patch;
-
-      }
-       else {
+      } else {
         console.warn("To do: Parse other primitives.");
       }
     }
@@ -1067,15 +1076,16 @@ export class MySceneGraph {
       var childrenIndex = nodeNames.indexOf("children");
       let highlightedIndex = nodeNames.indexOf("highlighted");
 
-      let highlighted = highlightedIndex != -1 ? grandChildren[highlightedIndex] : null;
+      let highlighted =
+        highlightedIndex != -1 ? grandChildren[highlightedIndex] : null;
 
-      if(highlighted != null){
+      if (highlighted != null) {
         let r = this.reader.getFloat(highlighted, "r");
         let g = this.reader.getFloat(highlighted, "g");
         let b = this.reader.getFloat(highlighted, "b");
         let scale_h = this.reader.getFloat(highlighted, "scale_h");
 
-        if(r == null || g == null || b == null || scale_h == null){
+        if (r == null || g == null || b == null || scale_h == null) {
           return "Invalid highlighted component";
         }
 
@@ -1083,10 +1093,10 @@ export class MySceneGraph {
           r: r,
           g: g,
           b: b,
-          scale_h: scale_h
-        }
-      }
-      else{
+          scale_h: scale_h,
+        };
+        this.components[componentID].isHighlighted = true;
+      } else {
         this.components[componentID].highlighted = null;
       }
       // Transformations
@@ -1185,7 +1195,6 @@ export class MySceneGraph {
       this.components[componentID].children = childrenComponents.children;
       this.components[componentID].primitives = childrenComponents.primitives;
     }
-
   }
 
   /**

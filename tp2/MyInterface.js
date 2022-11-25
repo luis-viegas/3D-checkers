@@ -28,8 +28,6 @@ export class MyInterface extends CGFinterface {
     this.initKeys();
 
     this.generalConfig();
-
-    return true;
   }
 
   /**
@@ -96,5 +94,19 @@ export class MyInterface extends CGFinterface {
 
         this.setActiveCamera(this.scene.camera);
       });
+  }
+
+  highlightConfig() {
+    let folder = this.gui.addFolder("Highlighted");
+    for (let property in this.scene.graph.components) {
+      if (
+        this.scene.graph.components[property].hasOwnProperty("isHighlighted")
+      ) {
+        folder
+          .add(this.scene.graph.components[property], "isHighlighted")
+          .name(property);
+      }
+    }
+    console.log(this.scene);
   }
 }

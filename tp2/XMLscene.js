@@ -55,6 +55,8 @@ export class XMLscene extends CGFscene {
 
     // this variable allows to display the axis (it starts disabled)
     this.displayAxis = false;
+
+    this.toggleHighlight = new Object();
   }
 
   /**
@@ -206,6 +208,8 @@ export class XMLscene extends CGFscene {
 
     this.interface.camerasConfig();
 
+    this.interface.highlightConfig();
+
     this.sceneInited = true;
   }
 
@@ -229,7 +233,7 @@ export class XMLscene extends CGFscene {
     // Doing the modulus (%) by 100 makes the timeFactor loop between 0 and 99
     // ( so the loop period of timeFactor is 100 times 100 ms = 10s ; the actual animation loop depends on how timeFactor is used in the shader )
     this.testShaders[1].setUniformsValues({
-      timeFactor: (t / 250) % 100,
+      timeFactor: (t / 100) % 100,
     });
   }
 
@@ -280,16 +284,6 @@ export class XMLscene extends CGFscene {
    * @param {object} component
    */
   drawComponent(component, previousAppId, previousTex) {
-    if (component.highlighted != undefined) {
-      this.setActiveShader(this.testShaders[1]);
-      this.testShaders[1].setUniformsValues({
-        red: component.highlighted.r,
-        green: component.highlighted.g,
-        blue: component.highlighted.b,
-        normScale: component.highlighted.scale_h,
-      });
-    }
-
     if (component.transformation != undefined)
       this.multMatrix(component.transformation);
 
@@ -350,6 +344,19 @@ export class XMLscene extends CGFscene {
       this.gl.TEXTURE_WRAP_T,
       this.gl.REPEAT
     );
+
+    if (component.highlighted != undefined) {
+      if (component.isHighlighted == true) {
+        this.setActiveShader(this.testShaders[1]);
+        this.testShaders[1].setUniformsValues({
+          red: component.highlighted.r,
+          green: component.highlighted.g,
+          blue: component.highlighted.b,
+          normScale: component.highlighted.scale_h,
+        });
+      }
+    }
+
     currentApperence.apply();
 
     for (let j = 0; j < component.primitives.length; j++) {
