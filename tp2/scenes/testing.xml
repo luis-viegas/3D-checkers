@@ -2,7 +2,7 @@
     <scene root="demoRoot" axis_length="5"/>
 
     <views default="defaultCamera">
-        <perspective id="defaultCamera" near="0.1" far="5" angle="45">
+        <perspective id="defaultCamera" near="0.1" far="50" angle="45">
             <from x="0" y="1" z="5" />
             <to x="0" y="1" z="0" />
         </perspective>
@@ -170,6 +170,24 @@
                 <scale sx="1.5" sy="1" sz="1"/>
             </keyframe>
         </keyframeanim>
+
+         <keyframeanim id="animation2">
+            <keyframe instant="5">
+                <translation x="0" y="0" z="0"/>
+                <rotation axis="z" angle="0"/>
+                <rotation axis="y" angle="0"/>
+                <rotation axis="x" angle="0"/>
+                <scale sx="1" sy="1" sz="1"/>
+            </keyframe>
+
+            <keyframe instant="120">
+                <translation x="0" y="0" z="0"/>
+                <rotation axis="z" angle="0"/>
+                <rotation axis="y" angle="45"/>
+                <rotation axis="x" angle="0"/>
+                <scale sx="1" sy="1" sz="1"/>
+            </keyframe>
+        </keyframeanim>
     </animations>
 
 
@@ -252,7 +270,23 @@
             </children>
         </component>
 
-        <component id="demoRoot">
+        <component id="barrel2">
+            <transformation>
+                <translate x="5" y="0" z="0" />
+            </transformation>
+            <animation id="animation2" />
+            <materials>
+                <material id="demoMaterial" />
+            </materials>
+            <texture id="none"/>
+            <children>
+                <componentref id="barrelBody" />
+                <componentref id="barrelLidBottom" />
+                <componentref id="barrelLidTop" />
+            </children>
+        </component>
+
+        <component id ="barrels">
             <transformation>
             </transformation>
             <animation id="animation1" />
@@ -262,6 +296,19 @@
             <texture id="none"/>
             <children>
                 <componentref id="barrel" />
+                <componentref id="barrel2" />
+            </children>
+        </component>
+
+        <component id="demoRoot">
+            <transformation>
+            </transformation>
+            <materials>
+                <material id="demoMaterial" />
+            </materials>
+            <texture id="none"/>
+            <children>
+                <componentref id="barrels" />
             </children>
         </component>
     </components>
