@@ -287,10 +287,10 @@ export class XMLscene extends CGFscene {
     this.applyViewMatrix();
 
     this.pushMatrix();
-
+    /*
     this.setActiveShader(this.testShaders[this.selectedExampleShader]);
     this.graph.textures["barrel"].bind(0);
-
+    */
     // Draw axis
     if (this.displayAxis) {
       this.axis.display();
@@ -379,6 +379,7 @@ export class XMLscene extends CGFscene {
       this.gl.REPEAT
     );
 
+    
     if (component.highlighted != undefined) {
       if (component.isHighlighted == true) {
         this.setActiveShader(this.testShaders[1]);
@@ -390,6 +391,7 @@ export class XMLscene extends CGFscene {
         });
       }
     }
+    
 
     currentApperence.apply();
 
@@ -397,9 +399,10 @@ export class XMLscene extends CGFscene {
       component.primitives[j].updateTexCoords(length_s, length_t);
       component.primitives[j].display();
     }
-
+    
     if (component.highlighted != undefined) {
-      this.setActiveShader(this.testShaders[0]);
+      this.setActiveShader(this.defaultShader);
     }
+    
   }
 }

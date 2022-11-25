@@ -660,7 +660,6 @@
             </materials>
             <texture id="demoTexture"/>
             <children>
-
                 <componentref id="wall"/>
                 <componentref id="door"/>
                 <componentref id="window1"/>
@@ -725,6 +724,7 @@
             <children>
                 <primitiveref id="tent"/>
             </children>
+            <highlighted r="1.0" g="0.5" b="0.5" scale_h="2" />
         </component>
 
 
