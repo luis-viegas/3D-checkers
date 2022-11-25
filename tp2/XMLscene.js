@@ -100,7 +100,7 @@ export class XMLscene extends CGFscene {
           let location = light[2];
           let target = light[9];
           // Substract the target from the location to get the direction
-          let direction = [location[0] - target[0], location[1] - target[1], location[2] - target[2]];
+          let direction = [target[0]-location[0],target[1]-location[1], target[2]-location[2]];
           //Normalize the direction vector
           let magnitude = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2]);
           direction = [direction[0] / magnitude, direction[1] / magnitude, direction[2] / magnitude];
