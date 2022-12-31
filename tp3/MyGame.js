@@ -45,7 +45,6 @@ class MyGame {
         this.scene.setPickEnabled(false);
         break;
       case gameState.Player1PickingPiece:
-
         this.scene.setPickEnabled(true);
         this.availablePieces = this.board.getAvailablePieces(1);
 
@@ -76,7 +75,6 @@ class MyGame {
           this.selectedDestination = undefined;
 
           let availableDestinations = this.board.getAvailableDestinations(this.selectedPiece);
-          console.log(availableDestinations)
           for(let i = 0; i < availableDestinations.length; i++){
             if( this.board.isPieceBetween(this.selectedPiece.getTile(), availableDestinations[i])){
               this.setState(gameState.Player1PickingDestination);
@@ -131,10 +129,10 @@ class MyGame {
     if (mode == false /* && some other game conditions */){
       if (results != null && results.length > 0) { // any results?
         for (var i=0; i< results.length; i++) {
+          console.log(results[i])
           var obj = results[i][0]; // get object from result
           if (obj) { // exists?
             var uniqueId = results[i][1] // get id
-            console.log(obj)
             this.onObjectSelected(obj, uniqueId);
           }
         }

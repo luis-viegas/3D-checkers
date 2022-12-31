@@ -30,13 +30,20 @@ class MyPiece {
     return result;
   }
 
-  display() {
+  display(pickable = false) {
     this.scene.pushMatrix();
     this.scene.translate(this.tile.coords.x, 0, -1 * this.tile.coords.y);
     this.scene.multMatrix(this.scene.graph.components["piece"].transformation);
 
-
-    this.scene.graph.appearences[this.type].apply();
+    if (pickable) {
+      this.scene.registerForPick(this.id, this);
+      this.scene.graph.appearences["highlight"].apply();
+    }
+    else{
+      this.scene.registerForPick(-1, this);
+      this.scene.graph.appearences[this.type].apply();
+    }
+ 
 
     for (
       let j = 0;
@@ -45,6 +52,8 @@ class MyPiece {
     ) {
       this.scene.graph.components["piece"].primitives[j].display();
     }
+
+
 
     this.scene.popMatrix();
   }

@@ -42,15 +42,24 @@ class MyTile {
     return this.piece.print();
   }
 
-  display() {
+  display(pickable) {
     this.scene.pushMatrix();
     this.scene.translate(this.coords.x, 0, -1* this.coords.y);
     this.scene.multMatrix(this.scene.graph.components["tile"].transformation);
 
-    if(this.getTileColor() === "white") {
-      this.scene.graph.appearences["white"].apply();
-    } else {
-      this.scene.graph.appearences["black"].apply();
+    if(pickable) {
+      this.scene.registerForPick(this.id + 64, this);
+      //Applies the highlight appearance to the tile
+      this.scene.graph.appearences["highlight"].apply();
+    }
+    else{
+      this.scene.registerForPick(-1, this);
+      //Applies the white or black appearance to the tile
+      if(this.getTileColor() === "white") {
+        this.scene.graph.appearences["white"].apply();
+      } else {
+        this.scene.graph.appearences["black"].apply();
+      }
     }
 
     for (let j = 0; j < this.scene.graph.components["tile"].primitives.length; j++) {

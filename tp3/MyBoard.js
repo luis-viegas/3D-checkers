@@ -237,7 +237,30 @@ class MyBoard {
       
     }
 
-    return availableMoves;
+    //Will store the final moves after checking if there is a jump
+    // If there is, only stores the possible jumps
+    // Else stores all the available moves
+    let finalMoves = [];
+
+    //After returning all the available moves, detect if any of them is a jump
+    for (let i = 0; i < availableMoves.length; i++) {
+      let distance = {
+        x: availableMoves[i].getCoords().x - pieceX,
+        y: availableMoves[i].getCoords().y - pieceY
+      }
+      if (Math.abs(distance.x) === 2 && Math.abs(distance.y) === 2) {
+        finalMoves.push(availableMoves[i]);
+      }
+
+    }
+
+    //If there is no jump, return all the available moves
+    if (finalMoves.length === 0) {
+      finalMoves = availableMoves;
+    }
+
+
+    return finalMoves;
 
   }
 
@@ -245,9 +268,13 @@ class MyBoard {
   //Verify if the piece can move and return the pieces the player can move
   getAvailablePieces(player) {
     let playerColor = player === 1 ?  "white" : "black";
+    //stores pre-verified pieces that can move
     let availablePieces = [];
+    //stores the final pieces that can move and obligates to eat
+    let finalAvailablePieces = [];
+
     for (let i = 0; i < this.pieces.length; i++) {
-      if (this.pieces[i].getType() === playerColor) {
+      if (this.pieces[i].getType() === playerColor && this.pieces[i].getTile() !== null) {
         availablePieces.push(this.pieces[i]);
       }
     }
@@ -257,39 +284,64 @@ class MyBoard {
       let piece = availablePieces[i];
       let tile = this.getTile(piece);
       let availableMoves = this.getAvailableMoves(tile, piece);
+      //Verify if the moves are jumps
+      let isJump = false;
+      for (let j = 0; j < availableMoves.length; j++) {
+        let distance = {
+          x: availableMoves[j].getCoords().x - tile.getCoords().x,
+          y: availableMoves[j].getCoords().y - tile.getCoords().y
+        }
+        if (Math.abs(distance.x) === 2 && Math.abs(distance.y) === 2) {
+          isJump = true;
+        }
+      }
+      //If the piece can move and it is a jump, add it to the final pieces
+      if (availableMoves.length > 0 && isJump) {
+        finalAvailablePieces.push(piece);
+      }
+
       if (availableMoves.length === 0) {
         availablePieces.splice(i, 1);
       }
     }
-    return availablePieces;
+
+    //If there is no jump, return all the available pieces
+    if (finalAvailablePieces.length === 0) {
+      finalAvailablePieces = availablePieces;
+    }
+
+    return finalAvailablePieces;
   }
 
   /**
    * Renders the board and the pieces
    */
   display() {
+    this.scene.clearPickRegistration();
 
     for(let i = 0; i < this.board.length; i++){
       for(let j = 0; j < this.board[i].length; j++){
+        let pickable = false
         this.scene.pushMatrix();
 
         if (this.scene.game.availableDestinations !== undefined){
           if(this.scene.game.availableDestinations.includes(this.board[i][j])){
-            this.scene.registerForPick(this.board[i][j].id + 64, this.board[i][j]);
+            pickable = true;
           }
         }
 
-        this.board[i][j].display();
+        this.board[i][j].display(pickable);
         this.scene.popMatrix();
 
         if(this.board[i][j].getPiece() !== null){
+          pickable = false
           this.scene.pushMatrix();
           if (this.scene.game.availablePieces !== undefined){
             if(this.scene.game.availablePieces.includes(this.board[i][j].getPiece())){
-              this.scene.registerForPick(this.board[i][j].getPiece().id, this.board[i][j].getPiece());
+              pickable = true;
             }
           }
-          this.board[i][j].getPiece().display();
+          this.board[i][j].getPiece().display(pickable);
 
           this.scene.popMatrix();
 

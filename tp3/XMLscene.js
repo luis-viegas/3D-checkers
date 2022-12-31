@@ -242,7 +242,7 @@ export class XMLscene extends CGFscene {
   //Handler of m key press
   startGame() {
     if(this.game.state == gameState.NotStarted){
-      this.game.setState(gameState.Player1PickingPiece);
+      this.game.setState(gameState.Player2PickingPiece);
       alert("Game started!");
     }
   }
