@@ -1,7 +1,8 @@
 import { MyPiece } from "./MyPiece.js";
 
 class MyTile {
-  constructor(id = -1, coords = { x: 0, y: 0 }, piece = null) {
+  constructor(scene, id = -1, coords = { x: 0, y: 0 }, piece = null) {
+    this.scene = scene
     this.id = id;
     this.coords = coords;
     this.piece = piece;
@@ -13,8 +14,10 @@ class MyTile {
   }
   setPiece(piece) {
     this.piece = piece;
+    this.piece.setTile(this);
   }
   removePiece() {
+    this.piece.setTile(null)  
     this.piece = null;
   }
   moveMainBoard() {
@@ -28,11 +31,33 @@ class MyTile {
     return (this.coords.x + this.coords.y) % 2 === 0 ? "white" : "black";
   }
 
-  display() {
+  getCoords() {
+    return this.coords;
+  }
+
+  print() {
     if (this.piece === null) {
       return " ";
     }
-    return this.piece.display();
+    return this.piece.print();
+  }
+
+  display() {
+    this.scene.pushMatrix();
+    this.scene.translate(this.coords.x, 0, -1* this.coords.y);
+    this.scene.multMatrix(this.scene.graph.components["tile"].transformation);
+
+    if(this.getTileColor() === "white") {
+      this.scene.graph.appearences["white"].apply();
+    } else {
+      this.scene.graph.appearences["black"].apply();
+    }
+
+    for (let j = 0; j < this.scene.graph.components["tile"].primitives.length; j++) {
+      this.scene.graph.components["tile"].primitives[j].display();
+    }
+
+    this.scene.popMatrix();
   }
 }
 

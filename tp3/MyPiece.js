@@ -1,5 +1,7 @@
+
 class MyPiece {
-  constructor(id = -1, type, tile = null) {
+  constructor(scene, id = -1, type, tile = null) {
+    this.scene = scene;
     this.id = id;
     this.type = type;
     this.tile = tile;
@@ -13,10 +15,38 @@ class MyPiece {
     this.type = type;
   }
 
-  display() {
+  setTile(tile) {
+    this.tile = tile;
+  }
+
+  getTile() {
+    return this.tile;
+  }
+
+
+  print() {
     let result = "";
     this.type === "white" ? (result = "W") : (result = "B");
     return result;
+  }
+
+  display() {
+    this.scene.pushMatrix();
+    this.scene.translate(this.tile.coords.x, 0, -1 * this.tile.coords.y);
+    this.scene.multMatrix(this.scene.graph.components["piece"].transformation);
+
+
+    this.scene.graph.appearences[this.type].apply();
+
+    for (
+      let j = 0;
+      j < this.scene.graph.components["piece"].primitives.length;
+      j++
+    ) {
+      this.scene.graph.components["piece"].primitives[j].display();
+    }
+
+    this.scene.popMatrix();
   }
 }
 

@@ -1,7 +1,6 @@
 import { CGFappearance, CGFlight, CGFscene, CGFshader } from "../lib/CGF.js";
 import { CGFaxis, CGFcamera } from "../lib/CGF.js";
-
-import { MyGame} from "./MyGame.js";
+import { MyGame, gameState } from "./myGame.js";
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -54,6 +53,7 @@ export class XMLscene extends CGFscene {
     this.setUpdatePeriod(1000);
     //This variable allows to change between materials pressing the button m/M
     this.currentMaterial = 0;
+    this.setPickEnabled(false);
 
     // this variable allows to display the axis (it starts disabled)
     this.displayAxis = false;
@@ -218,9 +218,6 @@ export class XMLscene extends CGFscene {
       this.graph.ambient[3]
     );
 
-    // Extract the game elements from the graph
-    this.game = new MyGame(this);
-
     this.initLights();
 
     this.initCameras();
@@ -233,6 +230,8 @@ export class XMLscene extends CGFscene {
 
     this.interface.highlightConfig();
 
+    this.game = new MyGame(this);
+
     this.sceneInited = true;
 
     this.setUpdatePeriod(10);
@@ -241,9 +240,20 @@ export class XMLscene extends CGFscene {
   }
 
   //Handler of m key press
-  changeMaterialId() {
-    this.currentMaterial++;
+  startGame() {
+    if(this.game.state == gameState.NotStarted){
+      this.game.setState(gameState.Player1PickingPiece);
+      alert("Game started!");
+    }
   }
+
+  //Handler of r key press
+  resetGame() {
+    this.game = new MyGame(this);
+    this.game.setState(gameState.NotStarted);
+    alert("Game restarted!");
+  }
+  
 
   updateAxis() {
     console.log("Axis updated");
@@ -287,6 +297,9 @@ export class XMLscene extends CGFscene {
     // Initialize Model-View matrix as identity (no transformation
     this.updateProjectionMatrix();
     this.loadIdentity();
+
+    this.game.managePick(this.pickMode, this.pickResults);
+    this.clearPickRegistration();
 
     // Apply transformations corresponding to the camera position relative to the origin
     this.applyViewMatrix();
@@ -361,13 +374,14 @@ export class XMLscene extends CGFscene {
 
     for (let i = 0; i < component.children.length; i++) {
       this.pushMatrix();
-      console.log(component.children[i].name)
-      
-      if(component.children[i].name === "game"){
+
+      if(component.children[i].name == "game"){
         this.game.display();
-      }else{
+      }
+      else{
         this.drawComponent(component.children[i], appearenceId, textParent);
       }
+
       
 
       this.popMatrix();

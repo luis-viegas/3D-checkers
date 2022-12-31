@@ -1,0 +1,266 @@
+<sxs>
+    <scene root="scene" axis_length="5"/>
+
+    <views default="defaultCamera">
+        <perspective id="defaultCamera" near="0.1" far="50" angle="45">
+            <from x="4" y="10" z="5" />
+            <to x="4" y="1" z="0" />
+        </perspective>
+        <perspective id="defaultCamera2" near="0.1" far="500" angle="45">
+            <from x="-30" y="-15" z="-30" />
+            <to x="0" y="2" z="0" />
+        </perspective>
+    </views>
+
+    <ambient>
+        <ambient r="0.1" g="0.1" b="0.1" a="1.0" />
+        <background r="0.0" g="0.0" b="0.0" a="1.0" />
+    </ambient>
+
+    <lights>
+        <omni id="demoLight" enabled="1">
+            <location x="20.8" y="11.9" z="10" w="1.0" />
+            <ambient r="0" g="0" b="0" a="1.0" />
+            <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
+            <specular r="0.5" g="0.5" b="0.5" a="1.0" />
+        </omni>
+
+    </lights>
+
+    <textures>
+        <texture id="demoTexture" file="scenes/images/vidral.jpg" />
+        <texture id="wafer" file="scenes/images/wafer.jpg" />
+        <texture id="ice_cream" file="scenes/images/ice_cream.jpg" />
+        <texture id="pebble_floor" file="scenes/images/pebble_floor.jpg" />
+        <texture id="menu" file="scenes/images/menu.jpg" />
+        <texture id="metal" file="scenes/images/metal.jpg" />
+        <texture id="barrel" file="scenes/images/barrel2.jpg" />
+    </textures>
+
+    <materials>
+        <material id="white" shininess="10">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
+            <diffuse r="1.0" g="1" b="1" a="1.0" />
+            <specular r="0.5" g="0.15" b="0.15" a="1.0" />
+        </material>
+        <material id="black" shininess="10">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="0.1" g="0.1" b="0.1" a="1.0" />
+            <diffuse r="0.1" g="0.1" b="0.1" a="1.0" />
+            <specular r="0.1" g="0.1" b="0.1" a="1.0" />
+        </material>
+    </materials>
+
+    <transformations>
+        <transformation id="transformIceCream">
+            <translate x="0" y="10" z="0"/>
+            <rotate axis="x" angle="90"/>
+        </transformation>
+
+        <transformation id="transformationGround">
+            <scale x="35" y="1" z="15"/>
+            <translate x="-0.5" y="0" z="0.5"/>
+            <rotate axis="x" angle="-90"/>
+        </transformation>
+    </transformations>
+
+    <primitives>
+        <primitive id="demoRectangle">
+            <rectangle x1="0" y1="0" x2="1" y2="1" />
+        </primitive>
+        <primitive id="demoTriangle">
+            <triangle x1="-1.5" y1="0.1" z1="-0.75" x2="0" y2="0.1" z2="1.25" x3="1.5" y3="0.1" z3="-0.75" />
+        </primitive>
+        <primitive id="demoCylinder">
+            <cylinder base="2.5" top="0" height="10" slices="40" stacks="60"/>
+        </primitive>
+        <primitive id="demoSphere"> 
+            <sphere  radius="2.35" slices="20" stacks="20"/>
+        </primitive>
+        <primitive id="piece"> 
+            <sphere  radius="0.4" slices="20" stacks="20"/>
+        </primitive>
+        <primitive id="demoTorus">
+            <torus inner="0.25" outer="2.5" slices="50" loops="50"/> 
+        </primitive>
+        <primitive id="cherryBall">
+            <sphere  radius="0.75" slices="20" stacks="20"/>
+        </primitive>
+        <primitive id="cherryStick">
+            <cylinder base="0.1" top="0.05" height="2.5" slices="40" stacks="60"/>
+        </primitive>
+        <primitive id="pyramidtriangle">
+            <triangle x1="1.0" y1="0.0" z1="-1.0" x2="-1.0" y2="0.0" z2="-1.0" x3="0.0" y3="1.0" z3="0.0" />
+        </primitive>
+        <primitive id="poleCylinder">
+            <cylinder base="2" top="2" height="40" slices="40" stacks="60"/>
+        </primitive>
+        <primitive id ="tile">
+            <patch degree_u ="1" parts_u ="20" degree_v ="1" parts_v ="20">
+                <controlpoint x ="0" y ="0" z ="0" />
+                <controlpoint x ="0" y ="0" z ="-1" />
+                <controlpoint x ="1" y ="0" z ="0" />
+                <controlpoint x ="1" y ="0" z ="-1" />
+            </patch>
+        </primitive>
+        <primitive id ="tent">
+            <patch degree_u ="1" parts_u ="20" degree_v ="2" parts_v ="20">
+                <controlpoint x ="-1" y ="0" z ="1" />
+                <controlpoint x ="-1" y ="2" z ="0" />
+                <controlpoint x ="-1" y ="0" z ="-1" />
+                <controlpoint x ="1" y ="0" z ="1" />
+                <controlpoint x ="1" y ="2" z ="0" />
+                <controlpoint x ="1" y ="0" z ="-1" />
+            </patch>
+        </primitive>
+        <primitive id ="halfBarrelBody">
+            <patch degree_u ="2" parts_u ="20" degree_v ="3" parts_v ="20">
+                <controlpoint x ="0" y ="0" z ="0.5" />
+                <controlpoint x ="-0.75" y ="0" z ="0.5" />
+                <controlpoint x ="-0.75" y ="0" z ="-0.5" />
+                <controlpoint x ="0" y ="0" z ="-0.5" />
+
+                <controlpoint x ="0" y ="1" z ="1" />
+                <controlpoint x ="-1.5" y ="1" z ="1" />
+                <controlpoint x ="-2.5" y ="1" z ="-1" />
+                <controlpoint x ="0" y ="1" z ="-1" />
+
+                <controlpoint x ="0" y ="2" z ="0.5" />
+                <controlpoint x ="-0.75" y ="2" z ="0.5" />
+                <controlpoint x ="-0.75" y ="2" z ="-0.5" />
+                <controlpoint x ="0" y ="2" z ="-0.5" />
+            </patch>
+        </primitive>
+        <primitive id ="halfLid">
+            <patch degree_u ="1" parts_u ="20" degree_v ="3" parts_v ="20">
+                <controlpoint x ="0" y ="0" z ="0" />
+                <controlpoint x ="0" y ="0" z ="0" />
+                <controlpoint x ="0" y ="0" z ="0" />
+                <controlpoint x ="0" y ="0" z ="0" />
+                <controlpoint x ="0" y ="0" z ="0.5" />
+                <controlpoint x ="-0.75" y ="0" z ="0.5" />
+                <controlpoint x ="-0.75" y ="0" z ="-0.5" />
+                <controlpoint x ="0" y ="0" z ="-0.5" />
+            </patch>
+        </primitive>
+    </primitives>
+
+    <animations>
+        <keyframeanim id="animation1">
+            <keyframe instant="5">
+                <translation x="0" y="0" z="0"/>
+                <rotation axis="z" angle="0"/>
+                <rotation axis="y" angle="0"/>
+                <rotation axis="x" angle="0"/>
+                <scale sx="1" sy="1" sz="1"/>
+            </keyframe>
+            <keyframe instant="10">
+                <translation x="0" y="0" z="0"/>
+                <rotation axis="z" angle="0"/>
+                <rotation axis="y" angle="0"/>
+                <rotation axis="x" angle="0"/>
+                <scale sx="1" sy="1" sz="1"/>
+            </keyframe>
+            <keyframe instant="60">
+                <translation x="0" y="3" z="0"/>
+                <rotation axis="z" angle="0"/>
+                <rotation axis="y" angle="0"/>
+                <rotation axis="x" angle="0"/>
+                <scale sx="1.5" sy="1" sz="1"/>
+            </keyframe>
+        </keyframeanim>
+
+         <keyframeanim id="animation2">
+            <keyframe instant="0">
+                <translation x="0" y="0" z="0"/>
+                <rotation axis="z" angle="0"/>
+                <rotation axis="y" angle="0"/>
+                <rotation axis="x" angle="0"/>
+                <scale sx="1" sy="1" sz="1"/>
+            </keyframe>
+
+            <keyframe instant="1000">
+                <translation x="0" y="0" z="0"/>
+                <rotation axis="z" angle="0"/>
+                <rotation axis="y" angle="1200"/>
+                <rotation axis="x" angle="0"/>
+                <scale sx="1" sy="1" sz="1"/>
+            </keyframe>
+        </keyframeanim>
+    </animations>
+
+
+    <components>
+
+        <component id="tile">
+        <transformation>
+                <translate x="0" y="0" z="0"/>
+                <rotate axis="z" angle="0"/>
+                <rotate axis="y" angle="0"/>
+                <rotate axis="x" angle="0"/>
+                <scale x="1" y="1" z="1"/>
+            </transformation>
+            <materials>
+                <material id="white" />
+                <material id="black" />
+            </materials>
+            <texture id="none"/>
+            <children>
+                <primitiveref id="tile"/>
+            </children>
+        </component>
+
+        <component id="piece">
+            <transformation>
+                <translate x="0.5" y="0.2" z="-0.5"/>
+                <rotate axis="z" angle="0"/>
+                <rotate axis="y" angle="0"/>
+                <rotate axis="x" angle="0"/>
+                <scale x="1" y="0.5" z="1"/>
+            </transformation>
+            <materials>
+                <material id="white" />
+                <material id="black" />
+            </materials>
+            <texture id="none"/>
+            <children>
+                <primitiveref id="piece"/>
+            </children>
+        </component>
+
+        <component id="game">
+            <transformation>
+                <translate x="0" y="0" z="0"/>
+                <rotate axis="z" angle="0"/>
+                <rotate axis="y" angle="0"/>
+                <rotate axis="x" angle="0"/>
+                <scale x="1" y="1" z="1"/>
+            </transformation>
+            <materials>
+                <material id="white" />
+            </materials>
+            <texture id="none"/>
+            <children>
+                <componentref id="tile"/>
+                <componentref id="piece"/>
+            </children>
+        </component>
+
+        <component id="scene">
+            <transformation>
+                <rotate axis="z" angle="0"/>
+                <rotate axis="y" angle="0"/>
+                <rotate axis="x" angle="0"/>
+                <scale x="1" y="1" z="1"/>
+            </transformation>
+            <materials>
+                <material id="white" />
+            </materials>
+            <texture id="none"/>
+            <children>
+                <componentref id="game"/>
+            </children>
+        </component>
+    </components>
+</sxs>
