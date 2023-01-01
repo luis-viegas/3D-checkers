@@ -106,7 +106,16 @@ class MyBoard {
 
   movePiece(piece, startingTile, endingTile) {
     this.removePiece(startingTile);
+    //verify if piece is white and black and if it will become a king
+    if (piece.getType() === "white" && endingTile.getCoords().y === 7) {
+      piece.turnKing(true);
+    } else if (piece.getType() === "black" && endingTile.getCoords().y === 0) {
+      piece.turnKing(true);
+    }
+    
     this.addPiece(piece, endingTile);
+
+
   }
 
   // Returns the distance between two tiles
@@ -177,90 +186,136 @@ class MyBoard {
     let pieceY = pieceCoords.y;
 
     //Game of chekers logic
-    //TODO Add the logic for the other pieces
-    if (pieceColor === "white") {
-      if (pieceY < 7) {
-        if (pieceX > 0) {
-          if (this.board[pieceY + 1][pieceX - 1].getPiece() === null) {
-            availableMoves.push(this.board[pieceY + 1][pieceX - 1]);
-          }
-          if (this.board[pieceY + 1][pieceX - 1].getPiece() !== null && this.board[pieceY + 1][pieceX - 1].getPiece().getType() !== pieceColor) {
-            if (pieceY + 2 <= 7 && pieceX - 2 >= 0) {
-              if (this.board[pieceY + 2][pieceX - 2].getPiece() === null) {
-                availableMoves.push(this.board[pieceY + 2][pieceX - 2]);
+    if (!piece.isKing) {
+      if (pieceColor === "white") {
+        if (pieceY < 7) {
+          if (pieceX > 0) {
+            if (this.board[pieceY + 1][pieceX - 1].getPiece() === null) {
+              availableMoves.push(this.board[pieceY + 1][pieceX - 1]);
+            }
+            if (this.board[pieceY + 1][pieceX - 1].getPiece() !== null && this.board[pieceY + 1][pieceX - 1].getPiece().getType() !== pieceColor) {
+              if (pieceY + 2 <= 7 && pieceX - 2 >= 0) {
+                if (this.board[pieceY + 2][pieceX - 2].getPiece() === null) {
+                  availableMoves.push(this.board[pieceY + 2][pieceX - 2]);
+                }
               }
             }
           }
-        }
-        if (pieceX < 7) {
-          if (this.board[pieceY + 1][pieceX + 1].getPiece() === null) {
-            availableMoves.push(this.board[pieceY + 1][pieceX + 1]);
-          }
-          if (this.board[pieceY + 1][pieceX + 1].getPiece() !== null && this.board[pieceY + 1][pieceX + 1].getPiece().getType() !== pieceColor) {
-            if (pieceY + 2 <= 7 && pieceX + 2 <= 7) {
-              if (this.board[pieceY + 2][pieceX + 2].getPiece() === null) {
-                availableMoves.push(this.board[pieceY + 2][pieceX + 2]);
+          if (pieceX < 7) {
+            if (this.board[pieceY + 1][pieceX + 1].getPiece() === null) {
+              availableMoves.push(this.board[pieceY + 1][pieceX + 1]);
+            }
+            if (this.board[pieceY + 1][pieceX + 1].getPiece() !== null && this.board[pieceY + 1][pieceX + 1].getPiece().getType() !== pieceColor) {
+              if (pieceY + 2 <= 7 && pieceX + 2 <= 7) {
+                if (this.board[pieceY + 2][pieceX + 2].getPiece() === null) {
+                  availableMoves.push(this.board[pieceY + 2][pieceX + 2]);
+                }
               }
             }
           }
         }
       }
-    }
-    else {
-      if (pieceY > 0) {
-        if (pieceX > 0) {
-          if (this.board[pieceY - 1][pieceX - 1].getPiece() === null) {
-            availableMoves.push(this.board[pieceY - 1][pieceX - 1]);
-          }
-          if (this.board[pieceY - 1][pieceX - 1].getPiece() !== null && this.board[pieceY - 1][pieceX - 1].getPiece().getType() !== pieceColor) {
-            if (pieceY - 2 >= 0 && pieceX - 2 >= 0) {
-              if (this.board[pieceY - 2][pieceX - 2].getPiece() === null) {
-                availableMoves.push(this.board[pieceY - 2][pieceX - 2]);
+      else {
+        if (pieceY > 0) {
+          if (pieceX > 0) {
+            if (this.board[pieceY - 1][pieceX - 1].getPiece() === null) {
+              availableMoves.push(this.board[pieceY - 1][pieceX - 1]);
+            }
+            if (this.board[pieceY - 1][pieceX - 1].getPiece() !== null && this.board[pieceY - 1][pieceX - 1].getPiece().getType() !== pieceColor) {
+              if (pieceY - 2 >= 0 && pieceX - 2 >= 0) {
+                if (this.board[pieceY - 2][pieceX - 2].getPiece() === null) {
+                  availableMoves.push(this.board[pieceY - 2][pieceX - 2]);
+                }
               }
             }
           }
-        }
-        if (pieceX < 7) {
-          if (this.board[pieceY - 1][pieceX + 1].getPiece() === null) {
-            availableMoves.push(this.board[pieceY - 1][pieceX + 1]);
-          }
-          if (this.board[pieceY - 1][pieceX + 1].getPiece() !== null && this.board[pieceY - 1][pieceX + 1].getPiece().getType() !== pieceColor) {
-            if (pieceY - 2 >= 0 && pieceX + 2 <= 7) {
-              if (this.board[pieceY - 2][pieceX + 2].getPiece() === null) {
+          if (pieceX < 7) {
+            if (this.board[pieceY - 1][pieceX + 1].getPiece() === null) {
+              availableMoves.push(this.board[pieceY - 1][pieceX + 1]);
+            }
+            if (this.board[pieceY - 1][pieceX + 1].getPiece() !== null && this.board[pieceY - 1][pieceX + 1].getPiece().getType() !== pieceColor) {
+              if (pieceY - 2 >= 0 && pieceX + 2 <= 7) {
+                if (this.board[pieceY - 2][pieceX + 2].getPiece() === null) {
 
-                availableMoves.push(this.board[pieceY - 2][pieceX + 2]);
+                  availableMoves.push(this.board[pieceY - 2][pieceX + 2]);
+                }
               }
             }
           }
         }
       }
+
+          //Will store the final moves after checking if there is a jump
+      // If there is, only stores the possible jumps
+      // Else stores all the available moves
+      let finalMoves = [];
+
+      //After returning all the available moves, detect if any of them is a jump
+      for (let i = 0; i < availableMoves.length; i++) {
+        let distance = {
+          x: availableMoves[i].getCoords().x - pieceX,
+          y: availableMoves[i].getCoords().y - pieceY
+        }
+        if (Math.abs(distance.x) === 2 && Math.abs(distance.y) === 2) {
+          finalMoves.push(availableMoves[i]);
+        }
+
+      }
+
+      //If there is no jump, return all the available moves
+      if (finalMoves.length === 0) {
+        finalMoves = availableMoves;
+      }
+
+
+      return finalMoves;
+
+    } else {
+      //The piece is a king so can move in all four directions
+      //Check if there is a piece in the way
+      //If there is, check if there is a free tile after the piece
+      //If there is, add the tile to the available moves
+      //If there is not, do not add the tile to the available moves
+
+      let directions = [
+        { x: 1, y: 1 },
+        { x: 1, y: -1 },
+        { x: -1, y: 1 },
+        { x: -1, y: -1 }
+      ];
+
+      let jumpMoves = [];
+
+      for (let i = 0; i < directions.length; i++) {
+        let x = pieceX + directions[i].x;
+        let y = pieceY + directions[i].y;
+        while (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
+          if (this.board[y][x].getPiece() === null) {
+            availableMoves.push(this.board[y][x]);
+          } else {
+            let x2 = x + directions[i].x;
+            let y2 = y + directions[i].y;
+            if (x2 >= 0 && x2 <= 7 && y2 >= 0 && y2 <= 7) {
+              if (this.board[y2][x2].getPiece() === null) {
+                availableMoves.push(this.board[y2][x2]);
+                jumpMoves.push(this.board[y2][x2]);
+              }
+            }
+            break;
+          }
+          x += directions[i].x;
+          y += directions[i].y;
+        }
+      }
+
+      //If he has jump moves, return only the jump moves
+      if (jumpMoves.length > 0) {
+        return jumpMoves;
+      }
+
+      return availableMoves;
       
     }
-
-    //Will store the final moves after checking if there is a jump
-    // If there is, only stores the possible jumps
-    // Else stores all the available moves
-    let finalMoves = [];
-
-    //After returning all the available moves, detect if any of them is a jump
-    for (let i = 0; i < availableMoves.length; i++) {
-      let distance = {
-        x: availableMoves[i].getCoords().x - pieceX,
-        y: availableMoves[i].getCoords().y - pieceY
-      }
-      if (Math.abs(distance.x) === 2 && Math.abs(distance.y) === 2) {
-        finalMoves.push(availableMoves[i]);
-      }
-
-    }
-
-    //If there is no jump, return all the available moves
-    if (finalMoves.length === 0) {
-      finalMoves = availableMoves;
-    }
-
-
-    return finalMoves;
 
   }
 
@@ -284,6 +339,7 @@ class MyBoard {
       let piece = availablePieces[i];
       let tile = this.getTile(piece);
       let availableMoves = this.getAvailableMoves(tile, piece);
+      console.log(piece, availableMoves)
       //Verify if the moves are jumps
       let isJump = false;
       for (let j = 0; j < availableMoves.length; j++) {
@@ -291,7 +347,10 @@ class MyBoard {
           x: availableMoves[j].getCoords().x - tile.getCoords().x,
           y: availableMoves[j].getCoords().y - tile.getCoords().y
         }
-        if (Math.abs(distance.x) === 2 && Math.abs(distance.y) === 2) {
+        if (Math.abs(distance.x) === 2 && Math.abs(distance.y) === 2 && !piece.isKing) {
+          isJump = true;
+        }
+        if(piece.isKing && this.isPieceBetween(tile, availableMoves[j])) {
           isJump = true;
         }
       }
