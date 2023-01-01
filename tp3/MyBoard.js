@@ -61,6 +61,20 @@ class MyBoard {
     }
   }
 
+  getMainBoardPieces() {
+    let pieces = [];
+    for (let i = 0; i < this.board.length; i++) {
+      for (let j = 0; j < this.board[i].length; j++) {
+        if (this.board[i][j].getPiece() !== null) {
+          pieces.push(this.board[i][j].getPiece());
+        }
+      }
+    }
+    return pieces;
+  }
+
+
+
   addPiece(piece, tile) {
     tile.setPiece(piece);
   }
@@ -325,6 +339,9 @@ class MyBoard {
           if (this.board[y][x].getPiece() === null) {
             availableMoves.push(this.board[y][x]);
           } else {
+            if (this.board[y][x].getPiece().getType() === pieceColor) {
+              break;
+            }
             let x2 = x + directions[i].x;
             let y2 = y + directions[i].y;
             if (x2 >= 0 && x2 <= 7 && y2 >= 0 && y2 <= 7) {
@@ -357,12 +374,14 @@ class MyBoard {
     //stores the final pieces that can move and obligates to eat
     let finalAvailablePieces = [];
 
-    for (let i = 0; i < this.pieces.length; i++) {
+    let pieces = this.getMainBoardPieces();
+
+    for (let i = 0; i < pieces.length; i++) {
       if (
-        this.pieces[i].getType() === playerColor &&
-        this.pieces[i].getTile() !== null
+        pieces[i].getType() === playerColor &&
+        pieces[i].getTile() !== null
       ) {
-        availablePieces.push(this.pieces[i]);
+        availablePieces.push(pieces[i]);
       }
     }
 
@@ -371,7 +390,6 @@ class MyBoard {
       let piece = availablePieces[i];
       let tile = this.getTile(piece);
       let availableMoves = this.getAvailableMoves(tile, piece);
-      console.log(piece, availableMoves);
       //Verify if the moves are jumps
       let isJump = false;
       for (let j = 0; j < availableMoves.length; j++) {
@@ -390,6 +408,7 @@ class MyBoard {
           isJump = true;
         }
       }
+      console.log(piece, availableMoves, isJump)
       //If the piece can move and it is a jump, add it to the final pieces
       if (availableMoves.length > 0 && isJump) {
         finalAvailablePieces.push(piece);
@@ -399,6 +418,8 @@ class MyBoard {
         availablePieces.splice(i, 1);
       }
     }
+
+    console.log("----------------")
 
     //If there is no jump, return all the available pieces
     if (finalAvailablePieces.length === 0) {

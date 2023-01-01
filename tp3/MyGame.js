@@ -13,7 +13,8 @@ const gameState = {
   Player2PickingDestination: "Player2PickingDestination",
   Player1MovingPiece: "Player1MovingPiece",
   Player2MovingPiece: "Player2MovingPiece",
-  GameEnded: "GameEnded",
+  Player1Winner: "Player1Winner",
+  Player2Winner: "Player2Winner"
 };
 
 class MyGame {
@@ -48,11 +49,22 @@ class MyGame {
         this.scene.setPickEnabled(false);
         break;
       case gameState.Player1PickingPiece:
+        //Verify if there are any available pieces to play
+        //If not, end the game and declare the winner
+        if (this.board.getAvailablePieces(1).length === 0) {
+          this.setState(gameState.Player2Winner);
+          return;
+        }
         this.scene.setPickEnabled(true);
         this.availablePieces = this.board.getAvailablePieces(1);
 
         break;
       case gameState.Player2PickingPiece:
+
+        if (this.board.getAvailablePieces(2).length === 0) {
+          this.setState(gameState.Player1Winner);
+          return;
+        }
         this.scene.setPickEnabled(true);
         this.availablePieces = this.board.getAvailablePieces(2);
         break;
@@ -152,8 +164,17 @@ class MyGame {
 
         this.setState(gameState.Player1PickingPiece);
         break;
-      case gameState.GameEnded:
+      case gameState.Player1Winner:
         this.scene.setPickEnabled(false);
+        alert("White Pieces win!");
+        this.setState(gameState.NotStarted);
+        this.reset();
+        break;
+      case gameState.Player2Winner:
+        this.scene.setPickEnabled(false);
+        alert("Black Pieces win!");
+        this.setState(gameState.NotStarted);
+        this.reset();
         break;
     }
   }
@@ -256,6 +277,24 @@ class MyGame {
 
         break;
     }
+  }
+
+  /**
+   * Resets the game and the boards
+   */
+  reset(){
+    this.board = new MyBoard(this.scene, this);
+    this.whiteAuxBoard = new MyAuxBoard(this.scene, "white");
+    this.blackAuxBoard = new MyAuxBoard(this.scene, "black");
+    this.gameSequence = new MyGameSequence();
+    this.animator = new MyAnimator(this, this.gameSequence);
+
+    this.selectedPiece = undefined;
+    this.selectedDestination = undefined;
+    this.availablePieces = undefined;
+    this.availableDestinations = undefined;
+    this.pieceEaten = undefined;
+
   }
 
   playMovie() {
