@@ -3,8 +3,7 @@ import { MyPiece } from "./MyPiece.js";
 
 class MyBoard {
   constructor(scene) {
-
-    this.pieces = []
+    this.pieces = [];
 
     this.scene = scene;
     this.board = [
@@ -24,13 +23,23 @@ class MyBoard {
   createBoard() {
     for (let i = 0; i < this.board.length; i++) {
       for (let j = 0; j < this.board[i].length; j++) {
-        this.board[i][j] = new MyTile(this.scene ,i * 8 + j, { x: j, y: i }, null);
+        this.board[i][j] = new MyTile(
+          this.scene,
+          i * 8 + j,
+          { x: j, y: i },
+          null
+        );
       }
     }
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 8; j++) {
         if ((i + j) % 2 === 1) {
-          let piece = new MyPiece(this.scene, i * 8 + j, "white", this.board[i][j] );
+          let piece = new MyPiece(
+            this.scene,
+            i * 8 + j,
+            "white",
+            this.board[i][j]
+          );
           this.pieces.push(piece);
           this.board[i][j].setPiece(piece);
         }
@@ -39,7 +48,12 @@ class MyBoard {
     for (let i = 5; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         if ((i + j) % 2 === 1) {
-          let piece = new MyPiece(this.scene, i * 8 + j, "black", this.board[i][j]);
+          let piece = new MyPiece(
+            this.scene,
+            i * 8 + j,
+            "black",
+            this.board[i][j]
+          );
           this.pieces.push(piece);
           this.board[i][j].setPiece(piece);
         }
@@ -52,7 +66,14 @@ class MyBoard {
   }
 
   removePiece(tile) {
+    let id = tile.getPiece().id;
     tile.removePiece();
+    for (let i = 0; i < this.pieces.length; i++) {
+      if (this.pieces[i].id === id) {
+        this.pieces.splice(i, 1);
+        break;
+      }
+    }
   }
 
   getPiece(tile) {
@@ -112,10 +133,8 @@ class MyBoard {
     } else if (piece.getType() === "black" && endingTile.getCoords().y === 0) {
       piece.turnKing(true);
     }
-    
+
     this.addPiece(piece, endingTile);
-
-
   }
 
   // Returns the distance between two tiles
@@ -133,13 +152,17 @@ class MyBoard {
     let distance = this.getTitleDistances(startTile, endTile);
     let tileBetween = null;
     if (distance.x >= 2 && distance.y >= 2) {
-      tileBetween = this.board[endTile.getCoords().y - 1][endTile.getCoords().x - 1];
+      tileBetween =
+        this.board[endTile.getCoords().y - 1][endTile.getCoords().x - 1];
     } else if (distance.x <= -2 && distance.y >= 2) {
-      tileBetween = this.board[endTile.getCoords().y - 1][endTile.getCoords().x + 1];
+      tileBetween =
+        this.board[endTile.getCoords().y - 1][endTile.getCoords().x + 1];
     } else if (distance.x >= 2 && distance.y <= -2) {
-      tileBetween = this.board[endTile.getCoords().y + 1][endTile.getCoords().x - 1];
+      tileBetween =
+        this.board[endTile.getCoords().y + 1][endTile.getCoords().x - 1];
     } else if (distance.x <= -2 && distance.y <= -2) {
-      tileBetween = this.board[endTile.getCoords().y + 1][endTile.getCoords().x + 1];
+      tileBetween =
+        this.board[endTile.getCoords().y + 1][endTile.getCoords().x + 1];
     }
 
     return tileBetween;
@@ -147,26 +170,24 @@ class MyBoard {
 
   getPieceBetween(startTile, endTile) {
     let tileBetween = this.getTileBetween(startTile, endTile);
-    if(tileBetween == null ) return null;
+    if (tileBetween == null) return null;
     return tileBetween.getPiece();
   }
-
 
   // Returns a boolean to check if there is a piece between two tiles
   isPieceBetween(startTile, endTile) {
     let tileBetween = this.getTileBetween(startTile, endTile);
-    if(tileBetween == null ) return false; 
+    if (tileBetween == null) return false;
     if (tileBetween.getPiece() !== null) {
       return true;
     } else {
       return false;
     }
   }
-  
 
   /**
    * High level function that returns an array with the available destinations for a piece
-   *   
+   *
    * */
 
   getAvailableDestinations(piece) {
@@ -175,7 +196,7 @@ class MyBoard {
   }
 
   /**
-   * 
+   *
    * Returns an array with the available moves for a piece
    */
   getAvailableMoves(tile, piece) {
@@ -193,7 +214,11 @@ class MyBoard {
             if (this.board[pieceY + 1][pieceX - 1].getPiece() === null) {
               availableMoves.push(this.board[pieceY + 1][pieceX - 1]);
             }
-            if (this.board[pieceY + 1][pieceX - 1].getPiece() !== null && this.board[pieceY + 1][pieceX - 1].getPiece().getType() !== pieceColor) {
+            if (
+              this.board[pieceY + 1][pieceX - 1].getPiece() !== null &&
+              this.board[pieceY + 1][pieceX - 1].getPiece().getType() !==
+                pieceColor
+            ) {
               if (pieceY + 2 <= 7 && pieceX - 2 >= 0) {
                 if (this.board[pieceY + 2][pieceX - 2].getPiece() === null) {
                   availableMoves.push(this.board[pieceY + 2][pieceX - 2]);
@@ -205,7 +230,11 @@ class MyBoard {
             if (this.board[pieceY + 1][pieceX + 1].getPiece() === null) {
               availableMoves.push(this.board[pieceY + 1][pieceX + 1]);
             }
-            if (this.board[pieceY + 1][pieceX + 1].getPiece() !== null && this.board[pieceY + 1][pieceX + 1].getPiece().getType() !== pieceColor) {
+            if (
+              this.board[pieceY + 1][pieceX + 1].getPiece() !== null &&
+              this.board[pieceY + 1][pieceX + 1].getPiece().getType() !==
+                pieceColor
+            ) {
               if (pieceY + 2 <= 7 && pieceX + 2 <= 7) {
                 if (this.board[pieceY + 2][pieceX + 2].getPiece() === null) {
                   availableMoves.push(this.board[pieceY + 2][pieceX + 2]);
@@ -214,14 +243,17 @@ class MyBoard {
             }
           }
         }
-      }
-      else {
+      } else {
         if (pieceY > 0) {
           if (pieceX > 0) {
             if (this.board[pieceY - 1][pieceX - 1].getPiece() === null) {
               availableMoves.push(this.board[pieceY - 1][pieceX - 1]);
             }
-            if (this.board[pieceY - 1][pieceX - 1].getPiece() !== null && this.board[pieceY - 1][pieceX - 1].getPiece().getType() !== pieceColor) {
+            if (
+              this.board[pieceY - 1][pieceX - 1].getPiece() !== null &&
+              this.board[pieceY - 1][pieceX - 1].getPiece().getType() !==
+                pieceColor
+            ) {
               if (pieceY - 2 >= 0 && pieceX - 2 >= 0) {
                 if (this.board[pieceY - 2][pieceX - 2].getPiece() === null) {
                   availableMoves.push(this.board[pieceY - 2][pieceX - 2]);
@@ -233,10 +265,13 @@ class MyBoard {
             if (this.board[pieceY - 1][pieceX + 1].getPiece() === null) {
               availableMoves.push(this.board[pieceY - 1][pieceX + 1]);
             }
-            if (this.board[pieceY - 1][pieceX + 1].getPiece() !== null && this.board[pieceY - 1][pieceX + 1].getPiece().getType() !== pieceColor) {
+            if (
+              this.board[pieceY - 1][pieceX + 1].getPiece() !== null &&
+              this.board[pieceY - 1][pieceX + 1].getPiece().getType() !==
+                pieceColor
+            ) {
               if (pieceY - 2 >= 0 && pieceX + 2 <= 7) {
                 if (this.board[pieceY - 2][pieceX + 2].getPiece() === null) {
-
                   availableMoves.push(this.board[pieceY - 2][pieceX + 2]);
                 }
               }
@@ -245,7 +280,7 @@ class MyBoard {
         }
       }
 
-          //Will store the final moves after checking if there is a jump
+      //Will store the final moves after checking if there is a jump
       // If there is, only stores the possible jumps
       // Else stores all the available moves
       let finalMoves = [];
@@ -254,12 +289,11 @@ class MyBoard {
       for (let i = 0; i < availableMoves.length; i++) {
         let distance = {
           x: availableMoves[i].getCoords().x - pieceX,
-          y: availableMoves[i].getCoords().y - pieceY
-        }
+          y: availableMoves[i].getCoords().y - pieceY,
+        };
         if (Math.abs(distance.x) === 2 && Math.abs(distance.y) === 2) {
           finalMoves.push(availableMoves[i]);
         }
-
       }
 
       //If there is no jump, return all the available moves
@@ -267,9 +301,7 @@ class MyBoard {
         finalMoves = availableMoves;
       }
 
-
       return finalMoves;
-
     } else {
       //The piece is a king so can move in all four directions
       //Check if there is a piece in the way
@@ -281,7 +313,7 @@ class MyBoard {
         { x: 1, y: 1 },
         { x: 1, y: -1 },
         { x: -1, y: 1 },
-        { x: -1, y: -1 }
+        { x: -1, y: -1 },
       ];
 
       let jumpMoves = [];
@@ -314,43 +346,47 @@ class MyBoard {
       }
 
       return availableMoves;
-      
     }
-
   }
-
 
   //Verify if the piece can move and return the pieces the player can move
   getAvailablePieces(player) {
-    let playerColor = player === 1 ?  "white" : "black";
+    let playerColor = player === 1 ? "white" : "black";
     //stores pre-verified pieces that can move
     let availablePieces = [];
     //stores the final pieces that can move and obligates to eat
     let finalAvailablePieces = [];
 
     for (let i = 0; i < this.pieces.length; i++) {
-      if (this.pieces[i].getType() === playerColor && this.pieces[i].getTile() !== null) {
+      if (
+        this.pieces[i].getType() === playerColor &&
+        this.pieces[i].getTile() !== null
+      ) {
         availablePieces.push(this.pieces[i]);
       }
     }
 
     //Verify if the piece can move
-    for (let i = availablePieces.length -1; i >= 0; i--) {
+    for (let i = availablePieces.length - 1; i >= 0; i--) {
       let piece = availablePieces[i];
       let tile = this.getTile(piece);
       let availableMoves = this.getAvailableMoves(tile, piece);
-      console.log(piece, availableMoves)
+      console.log(piece, availableMoves);
       //Verify if the moves are jumps
       let isJump = false;
       for (let j = 0; j < availableMoves.length; j++) {
         let distance = {
           x: availableMoves[j].getCoords().x - tile.getCoords().x,
-          y: availableMoves[j].getCoords().y - tile.getCoords().y
-        }
-        if (Math.abs(distance.x) === 2 && Math.abs(distance.y) === 2 && !piece.isKing) {
+          y: availableMoves[j].getCoords().y - tile.getCoords().y,
+        };
+        if (
+          Math.abs(distance.x) === 2 &&
+          Math.abs(distance.y) === 2 &&
+          !piece.isKing
+        ) {
           isJump = true;
         }
-        if(piece.isKing && this.isPieceBetween(tile, availableMoves[j])) {
+        if (piece.isKing && this.isPieceBetween(tile, availableMoves[j])) {
           isJump = true;
         }
       }
@@ -378,13 +414,15 @@ class MyBoard {
   display() {
     this.scene.clearPickRegistration();
 
-    for(let i = 0; i < this.board.length; i++){
-      for(let j = 0; j < this.board[i].length; j++){
-        let pickable = false
+    for (let i = 0; i < this.board.length; i++) {
+      for (let j = 0; j < this.board[i].length; j++) {
+        let pickable = false;
         this.scene.pushMatrix();
 
-        if (this.scene.game.availableDestinations !== undefined){
-          if(this.scene.game.availableDestinations.includes(this.board[i][j])){
+        if (this.scene.game.availableDestinations !== undefined) {
+          if (
+            this.scene.game.availableDestinations.includes(this.board[i][j])
+          ) {
             pickable = true;
           }
         }
@@ -392,23 +430,25 @@ class MyBoard {
         this.board[i][j].display(pickable);
         this.scene.popMatrix();
 
-        if(this.board[i][j].getPiece() !== null){
-          pickable = false
+        if (this.board[i][j].getPiece() !== null) {
+          pickable = false;
           this.scene.pushMatrix();
-          if (this.scene.game.availablePieces !== undefined){
-            if(this.scene.game.availablePieces.includes(this.board[i][j].getPiece())){
+          if (this.scene.game.availablePieces !== undefined) {
+            if (
+              this.scene.game.availablePieces.includes(
+                this.board[i][j].getPiece()
+              )
+            ) {
               pickable = true;
             }
           }
           this.board[i][j].getPiece().display(pickable);
 
           this.scene.popMatrix();
-
         }
       }
     }
   }
-  
 
   // for debug puposes
   printBoard() {

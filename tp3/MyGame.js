@@ -79,6 +79,7 @@ class MyGame {
         );
         if (this.pieceEaten != undefined) {
           this.board.removePiece(this.pieceEaten.getTile());
+          this.blackAuxBoard.addPiece(this.pieceEaten);
           this.selectedPiece = this.board
             .getTileByCoords(this.selectedDestination.coords)
             .getPiece();
@@ -119,6 +120,7 @@ class MyGame {
         );
         if (this.pieceEaten != undefined) {
           this.board.removePiece(this.pieceEaten.getTile());
+          this.whiteAuxBoard.addPiece(this.pieceEaten);
           this.selectedPiece = this.board
             .getTileByCoords(this.selectedDestination.coords)
             .getPiece();

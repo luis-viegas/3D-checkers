@@ -39,6 +39,29 @@ class MyAuxBoard {
     }
   }
 
+  addPiece(piece) {
+    this.pieces.push(piece);
+
+    for (let i = 0; i < this.board.length; i++) {
+      for (let j = 0; j < this.board[i].length; j++) {
+        if (this.board[i][j].getPiece() === null) {
+          this.board[i][j].setPiece(piece);
+          return;
+        }
+      }
+    }
+  }
+
+  removePiece(tile) {
+    for (let i = 0; i < this.pieces.length; i++) {
+      if (this.pieces[i].getTile() === tile) {
+        this.pieces.splice(i, 1);
+        break;
+      }
+    }
+    tile.setPiece(null);
+  }
+
   display() {
     for (let i = 0; i < this.board.length; i++) {
       for (let j = 0; j < this.board[i].length; j++) {
@@ -47,19 +70,8 @@ class MyAuxBoard {
         this.scene.popMatrix();
 
         if (this.board[i][j].getPiece() !== null) {
-          pickable = false;
           this.scene.pushMatrix();
-          if (this.scene.game.availablePieces !== undefined) {
-            if (
-              this.scene.game.availablePieces.includes(
-                this.board[i][j].getPiece()
-              )
-            ) {
-              pickable = true;
-            }
-          }
-          this.board[i][j].getPiece().display(pickable);
-
+          this.board[i][j].getPiece().display(false);
           this.scene.popMatrix();
         }
       }
