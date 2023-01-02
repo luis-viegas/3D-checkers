@@ -1,6 +1,7 @@
 import { CGFappearance, CGFlight, CGFscene, CGFshader } from "../lib/CGF.js";
 import { CGFaxis, CGFcamera } from "../lib/CGF.js";
 import { MyGame, gameState } from "./myGame.js";
+import { MyCameraAnimation } from "./MyCameraAnimation.js";
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -65,7 +66,13 @@ export class XMLscene extends CGFscene {
    * Initializes the scene cameras.
    */
   initCameras() {
-    this.camera = this.graph.views[this.graph.default_view];
+    //This is used to create a deep copy of the camera
+
+    let starterCameraConfigs = this.graph.views[this.graph.default_view];
+    this.camera = new CGFcamera(starterCameraConfigs.fov, 
+      starterCameraConfigs.near, starterCameraConfigs.far,
+      starterCameraConfigs.position, starterCameraConfigs.target);
+
     this.interface.setActiveCamera(this.camera);
   }
   /**
@@ -253,7 +260,13 @@ export class XMLscene extends CGFscene {
     this.game.setState(gameState.NotStarted);
     alert("Game restarted!");
   }
-  
+
+  undoMove() {
+    if(this.game.state == gameState.Player1PickingPiece || this.game.state == gameState.Player2PickingPiece){
+      this.game.undoMove();
+    }
+  }
+
 
   updateAxis() {
     console.log("Axis updated");
@@ -264,9 +277,21 @@ export class XMLscene extends CGFscene {
     console.log("Lights updated");
   }
 
+  updateCamera(cameraId){
+    //Animate the camera to the new position
+    if(this.cameraAnimation != null){
+      return
+    }
+    let nextCamera = this.graph.views[cameraId]
+    this.setPickEnabled(false);
+    this.cameraAnimation = new MyCameraAnimation(this, this.camera, nextCamera.position, nextCamera.target);
+
+  }
+
   update(time) {
     if (this.startTime == null) {
       this.startTime = time;
+      this.lastTime = time;
     }
 
     //Update animations on each component of the scene
@@ -281,6 +306,29 @@ export class XMLscene extends CGFscene {
         timeFactor: (time / 100) % 100,
       });
     }
+
+    /**
+     * Update the camera animation
+     */
+
+    if(this.cameraAnimation != null){
+      this.cameraAnimation.update(time - this.lastTime);
+
+      if(this.cameraAnimation.isOver()){
+        this.cameraAnimation = null;
+        this.setPickEnabled(true);
+      }
+  
+    }
+
+    /**
+     * Update the game
+     */
+    this.game.update(time - this.lastTime);
+
+    this.lastTime = time;
+
+   
   }
 
   /**

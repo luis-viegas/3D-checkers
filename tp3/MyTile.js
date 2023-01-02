@@ -12,8 +12,10 @@ class MyTile {
   getPiece() {
     return this.piece;
   }
+
   setPiece(piece) {
     this.piece = piece;
+    if(piece == null) return;
     this.piece.setTile(this);
   }
   removePiece() {
@@ -27,6 +29,10 @@ class MyTile {
 
   getCoords() {
     return this.coords;
+  }
+
+  getDisplayCoords() {
+    return [this.coords.x, 0 , -this.coords.y ];
   }
 
   print() {

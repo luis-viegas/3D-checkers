@@ -52,14 +52,54 @@ class MyAuxBoard {
     }
   }
 
+  getNextEmptyTile() {
+    for (let i = 0; i < this.board.length; i++) {
+      for (let j = 0; j < this.board[i].length; j++) {
+        if (this.board[i][j].getPiece() === null) {
+          return this.board[i][j];
+        }
+      }
+    }
+  }
+  
+
   removePiece(tile) {
+    let piece;
     for (let i = 0; i < this.pieces.length; i++) {
       if (this.pieces[i].getTile() === tile) {
-        this.pieces.splice(i, 1);
+        piece = this.pieces.splice(i, 1);
         break;
       }
     }
     tile.setPiece(null);
+  }
+
+  removeLastPiece() {
+    let piece;
+    for (let i = this.pieces.length - 1; i >= 0; i--) {
+      if (this.pieces[i].getTile() !== null) {
+        this.pieces[i].getTile().setPiece(null);
+        piece = this.pieces.splice(i, 1);
+        break;
+      }
+    }
+
+    return piece[0];
+
+
+  }
+
+  /**
+   * If a piece was eaten in this move, returns one piece from this board to the main board
+   * @param {MyGameMove} move 
+   */
+  undoMove(move){
+    let pieceRemoved = null;
+    if(move.pieceEaten !== undefined){
+      pieceRemoved = this.removeLastPiece();
+    }
+    return pieceRemoved;
+    
   }
 
   display() {

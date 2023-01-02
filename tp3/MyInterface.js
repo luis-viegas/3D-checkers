@@ -46,6 +46,10 @@ export class MyInterface extends CGFinterface {
     if(event.key == "r" || event.key == "R"){
       this.scene.resetGame();
     }
+    if(event.key == "u" || event.key == "U"){
+      this.scene.undoMove();
+    }
+
     this.activeKeys[event.code] = true;
   }
 
@@ -93,9 +97,7 @@ export class MyInterface extends CGFinterface {
       .add(this.scene, "selectedView", this.scene.cameraIDs)
       .name("Camera View")
       .onChange(() => {
-        this.scene.camera = this.scene.graph.views[this.scene.selectedView];
-
-        this.setActiveCamera(this.scene.camera);
+        this.scene.updateCamera(this.scene.selectedView);
       });
   }
 

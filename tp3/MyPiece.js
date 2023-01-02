@@ -6,6 +6,7 @@ class MyPiece {
     this.type = type;
     this.tile = tile;
     this.isKing = king
+    this.animation = null;
   }
 
   /**
@@ -39,6 +40,16 @@ class MyPiece {
   turnKing(){
     this.isKing = true;
   }
+
+  
+  getAnimation(){
+    return this.animation;
+  }
+
+  setAnimation(animation){
+    this.animation = animation;
+  }
+  
   
 
   print() {
@@ -46,6 +57,7 @@ class MyPiece {
     this.type === "white" ? (result = "W") : (result = "B");
     return result;
   }
+
 
   /**
    * 
@@ -55,9 +67,16 @@ class MyPiece {
   display(pickable = false) {
     this.scene.pushMatrix();
     this.scene.translate(this.tile.coords.x, 0, -1 * this.tile.coords.y);
+    if(this.animation != null){
+      this.scene.multMatrix(this.animation.apply())
+    }
     this.scene.multMatrix(this.scene.graph.components["piece"].transformation);
 
-    if (pickable) {
+
+
+
+
+    if (pickable && this.animation == null) {
       this.scene.registerForPick(this.id, this);
       if(this.scene.game.selectedPiece === this)
         this.scene.graph.appearences["pieceSelected"].apply();

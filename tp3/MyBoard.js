@@ -139,16 +139,29 @@ class MyBoard {
     return this.board[converted.y][converted.x];
   }
 
+  /**
+   * Moves a piece from a tile to another tile
+   * @param {MyPiece} piece 
+   * @param {MyTile} startingTile 
+   * @param {MyTile} endingTile 
+   * returns true if the checker has turned into a king
+   */
   movePiece(piece, startingTile, endingTile) {
+    let hasTurned = false;
     this.removePiece(startingTile);
     //verify if piece is white and black and if it will become a king
     if (piece.getType() === "white" && endingTile.getCoords().y === 7) {
       piece.turnKing(true);
+      hasTurned = true;
     } else if (piece.getType() === "black" && endingTile.getCoords().y === 0) {
       piece.turnKing(true);
+      hasTurned = true;
     }
 
     this.addPiece(piece, endingTile);
+
+    return hasTurned;
+
   }
 
   // Returns the distance between two tiles
@@ -224,7 +237,7 @@ class MyBoard {
     if (!piece.isKing) {
       if (pieceColor === "white") {
         if (pieceY < 7) {
-          if (pieceX > 0) {
+          if (pieceX > 0 && this.board[pieceY + 1][pieceX - 1]!==undefined) {
             if (this.board[pieceY + 1][pieceX - 1].getPiece() === null) {
               availableMoves.push(this.board[pieceY + 1][pieceX - 1]);
             }
@@ -240,7 +253,7 @@ class MyBoard {
               }
             }
           }
-          if (pieceX < 7) {
+          if (pieceX < 7 && this.board[pieceY + 1][pieceX + 1]!==undefined) {
             if (this.board[pieceY + 1][pieceX + 1].getPiece() === null) {
               availableMoves.push(this.board[pieceY + 1][pieceX + 1]);
             }
@@ -259,7 +272,7 @@ class MyBoard {
         }
       } else {
         if (pieceY > 0) {
-          if (pieceX > 0) {
+          if (pieceX > 0 && this.board[pieceY - 1][pieceX - 1]!==undefined) {
             if (this.board[pieceY - 1][pieceX - 1].getPiece() === null) {
               availableMoves.push(this.board[pieceY - 1][pieceX - 1]);
             }
@@ -275,7 +288,7 @@ class MyBoard {
               }
             }
           }
-          if (pieceX < 7) {
+          if (pieceX < 7 && this.board[pieceY - 1][pieceX + 1]!==undefined) {
             if (this.board[pieceY - 1][pieceX + 1].getPiece() === null) {
               availableMoves.push(this.board[pieceY - 1][pieceX + 1]);
             }
@@ -408,7 +421,6 @@ class MyBoard {
           isJump = true;
         }
       }
-      console.log(piece, availableMoves, isJump)
       //If the piece can move and it is a jump, add it to the final pieces
       if (availableMoves.length > 0 && isJump) {
         finalAvailablePieces.push(piece);
@@ -419,7 +431,6 @@ class MyBoard {
       }
     }
 
-    console.log("----------------")
 
     //If there is no jump, return all the available pieces
     if (finalAvailablePieces.length === 0) {
@@ -469,6 +480,20 @@ class MyBoard {
         }
       }
     }
+  }
+
+  /**
+   * Undoes the last Move made
+   * @param {*} move 
+   */
+  undoMove(move){
+    this.movePiece(move.piece, move.endingTile, move.startingTile);
+
+    //Verify if the piece was turned into a king last move and turn it back
+    if(move.turnKing == true){
+      move.piece.isKing = false;
+    }
+
   }
 
   // for debug puposes
