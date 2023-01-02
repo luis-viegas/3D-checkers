@@ -7,7 +7,7 @@
             <to x="4" y="1" z="-2" />
         </perspective>
         <perspective id="middleCamera" near="0.1" far="500" angle="45">
-            <from x="4" y="30" z="-4.5" />
+            <from x="4" y="100" z="-4.5" />
             <to x="5.5" y="1" z="-4.5" />
         </perspective>
         <perspective id="blackCamera" near="0.1" far="500" angle="45">
@@ -48,6 +48,10 @@
         <texture id="floor"  file="scenes/images/floor.jpg" />
         <texture id="clockTex"  file="scenes/images/clock.jpg" />
         <texture id="clockWood"  file="scenes/images/clockwood.jpg" />
+        <texture id="wafer" file="scenes/images/wafer.jpg" />
+        <texture id="ice_cream" file="scenes/images/ice_cream.jpg" />
+        <texture id="coke" file="scenes/images/coke.jpg" />
+        <texture id="cokeTop" file="scenes/images/cokeTop.jpg" />
         
     </textures>
 
@@ -76,20 +80,22 @@
             <diffuse r="0.5" g="0.1" b="0.1" a="1.0" />
             <specular r="0.1" g="0.1" b="0.1" a="1.0" />
         </material>
+        <material id="red" shininess="10">
+             <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="0.0" g="0.0" b="0.0" a="1.0" />
+            <diffuse r="1.0" g="0.3" b="0.3" a="1.0" />
+            <specular r="0.5" g="0.15" b="0.15" a="1.0" />
+        </material>
+        <material id="brown" shininess="10">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="0.0" g="0.0" b="0.0" a="1.0" />
+            <diffuse r="0.62" g="0.32" b="0.17" a="1.0" />
+            <specular r="0.5" g="0.5" b="0.5" a="1.0" />
+        </material>
 
     </materials>
 
     <transformations>
-        <transformation id="transformIceCream">
-            <translate x="0" y="10" z="0"/>
-            <rotate axis="x" angle="90"/>
-        </transformation>
-
-        <transformation id="transformationGround">
-            <scale x="35" y="1" z="15"/>
-            <translate x="-0.5" y="0" z="0.5"/>
-            <rotate axis="x" angle="-90"/>
-        </transformation>
     </transformations>
 
     <primitives>
@@ -122,6 +128,9 @@
         </primitive>
         <primitive id="poleCylinder">
             <cylinder base="2" top="2" height="40" slices="40" stacks="60"/>
+        </primitive>
+        <primitive id="cylinder">
+            <cylinder base="2" top="2" height="2" slices="40" stacks="60"/>
         </primitive>
         <primitive id ="tile">
             <patch degree_u ="1" parts_u ="20" degree_v ="1" parts_v ="20">
@@ -596,6 +605,86 @@
             </children>
         </component>
 
+        <component id="iceBall1">
+            <transformation>
+            </transformation>
+            <materials>
+                <material id="inherit"/>
+            </materials>
+            <texture id="ice_cream"/>
+            <children>
+                <primitiveref id="demoSphere" />
+            </children>
+        </component>
+
+        <component id="iceBall2">
+            <transformation>
+                <translate x="0" y="0" z="-2"/>
+                <scale x="0.75" y="0.75" z="0.75"/>
+            </transformation>
+            <materials>
+                <material id="red"/>
+            </materials>
+            <texture id="ice_cream"/>
+            <children>
+                <primitiveref id="demoSphere"/>
+            </children>
+        </component>
+
+        
+
+        <component id="iceCream">
+            <transformation>
+                <scale x="0.3" y="0.3" z="0.3"/>
+                <translate x="-10" y="10" z="-30"/>
+                <rotate axis="x" angle="90"/>
+            </transformation>
+            <materials>
+                <material id="inherit"/>
+            </materials>
+            <texture id="wafer"/>
+            <children>
+                <primitiveref id="demoTorus" />
+                <primitiveref id="demoCylinder"/>
+                <componentref id="iceBall1"/>
+                <componentref id="iceBall2"/>
+            </children>
+        </component>
+
+        <component id="cokeTop">
+            <transformation>
+                <scale x="0.85" y="0.85" z="0.01"/>
+            </transformation>
+            <materials>
+                <material id="brown"/>
+            </materials>
+            <texture id="metal" />
+            <children>
+                <primitiveref id="demoSphere"/>
+            </children>
+        </component>
+
+
+        <component id="coke">
+            <transformation>
+                <scale x="0.35" y="1" z="0.35"/>
+                <translate x="40" y="2" z="3"/>
+                <rotate axis="y" angle="140"/>
+                <rotate axis="x" angle="90"/>
+                
+            </transformation>
+            <materials>
+                <material id="inherit"/>
+            </materials>
+            <texture id="coke"/>
+            <children>
+                <primitiveref id="cylinder"/>
+                <componentref id="cokeTop"/>
+            </children>
+        </component>
+
+        
+
         <component id="scene">
             <transformation>
                 <rotate axis="z" angle="0"/>
@@ -613,6 +702,8 @@
                 <componentref id="floor"/>
                 <componentref id="clock1"/>
                 <componentref id="clock2"/>
+                <componentref id="iceCream"/>
+                <componentref id="coke"/>
                 
             </children>
         </component>
