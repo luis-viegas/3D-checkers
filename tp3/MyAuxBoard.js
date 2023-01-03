@@ -35,6 +35,7 @@ class MyAuxBoard {
           { x: j + this.offset, y: i },
           null
         );
+        this.board[i][j].setBoardType("aux");
       }
     }
   }
@@ -61,7 +62,16 @@ class MyAuxBoard {
       }
     }
   }
-  
+
+  getLastAddedTile() {
+    for (let i = this.board.length - 1; i >= 0; i--) {
+      for (let j = this.board[i].length - 1; j >= 0; j--) {
+        if (this.board[i][j].getPiece() !== null) {
+          return this.board[i][j];
+        }
+      }
+    }
+  }
 
   removePiece(tile) {
     let piece;
@@ -85,21 +95,18 @@ class MyAuxBoard {
     }
 
     return piece[0];
-
-
   }
 
   /**
    * If a piece was eaten in this move, returns one piece from this board to the main board
-   * @param {MyGameMove} move 
+   * @param {MyGameMove} move
    */
-  undoMove(move){
+  undoMove(move) {
     let pieceRemoved = null;
-    if(move.pieceEaten !== undefined){
+    if (move.pieceEaten !== undefined) {
       pieceRemoved = this.removeLastPiece();
     }
     return pieceRemoved;
-    
   }
 
   display() {

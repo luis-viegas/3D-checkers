@@ -17,7 +17,7 @@ const gameState = {
   Player1MovingPiece: "Player1MovingPiece",
   Player2MovingPiece: "Player2MovingPiece",
   Player1Winner: "Player1Winner",
-  Player2Winner: "Player2Winner"
+  Player2Winner: "Player2Winner",
 };
 
 class MyGame {
@@ -51,7 +51,7 @@ class MyGame {
 
     switch (this.state) {
       case gameState.NotStarted:
-        this.scene.setPickEnabled(false);
+        this.scene.setPickEnabled(true);
         break;
       case gameState.Player1PickingPiece:
         //Verify if there are any available pieces to play
@@ -65,7 +65,6 @@ class MyGame {
 
         break;
       case gameState.Player2PickingPiece:
-
         if (this.board.getAvailablePieces(2).length === 0) {
           this.setState(gameState.Player1Winner);
           return;
@@ -90,17 +89,18 @@ class MyGame {
         this.scene.setPickEnabled(false);
 
         //Create SimpleAnimation for piece
-        pieceEatenTile = this.pieceEaten == undefined ? undefined : this.pieceEaten.getTile();
-      
+        pieceEatenTile =
+          this.pieceEaten == undefined ? undefined : this.pieceEaten.getTile();
+
         this.move = new MyGameMove(
-          this.board, 
-          this.selectedPiece, 
-          this.selectedPiece.getTile(), 
-          this.selectedDestination, 
-          this.pieceEaten, 
+          this.board,
+          this.selectedPiece,
+          this.selectedPiece.getTile(),
+          this.selectedDestination,
+          this.pieceEaten,
           pieceEatenTile
         );
-        
+
         fromPos = this.selectedPiece.getTile().getDisplayCoords();
         toPos = this.selectedDestination.getDisplayCoords();
 
@@ -112,17 +112,18 @@ class MyGame {
         this.scene.setPickEnabled(false);
 
         //Create SimpleAnimation for piece
-        pieceEatenTile = this.pieceEaten == undefined ? undefined : this.pieceEaten.getTile();
-      
+        pieceEatenTile =
+          this.pieceEaten == undefined ? undefined : this.pieceEaten.getTile();
+
         this.move = new MyGameMove(
-          this.board, 
-          this.selectedPiece, 
-          this.selectedPiece.getTile(), 
-          this.selectedDestination, 
-          this.pieceEaten, 
+          this.board,
+          this.selectedPiece,
+          this.selectedPiece.getTile(),
+          this.selectedDestination,
+          this.pieceEaten,
           pieceEatenTile
         );
-        
+
         fromPos = this.selectedPiece.getTile().getDisplayCoords();
         toPos = this.selectedDestination.getDisplayCoords();
 
@@ -146,8 +147,8 @@ class MyGame {
 
   /**
    * Manage Pick resutls
-   * @param {boolean} mode 
-   * @param {Array(id, object)} results 
+   * @param {boolean} mode
+   * @param {Array(id, object)} results
    */
   managePick(mode, results) {
     if (mode == false /* && some other game conditions */) {
@@ -172,6 +173,7 @@ class MyGame {
       case gameState.Player1PickingPiece:
         if (obj instanceof MyPiece) {
           this.selectedPiece = obj;
+
           this.setState(gameState.Player1PickingDestination);
         }
         break;
@@ -246,6 +248,21 @@ class MyGame {
 
         break;
     }
+
+    if (id === 1000) {
+      this.scene.undoMove();
+    }
+
+    if (id === 1001 || id === 1002 || id === 1003) {
+      let cameras = {
+        1001: "whiteCamera",
+        1002: "blackCamera",
+        1003: "middleCamera",
+      };
+      this.scene.updateCamera(cameras[id]);
+    }
+
+    console.log("Selected object: " + obj + ", with pick id " + id);
   }
 
   detectCollision(piece1Pos, piece2Pos, pieceRadius = 0.5) {
@@ -258,15 +275,130 @@ class MyGame {
     );
   }
 
-
   /**
    * Depending on game state, manages the animations of the game elements and the consequences
-   * @param {integer} deltaTime 
-   * @returns 
+   * @param {integer} deltaTime
+   * @returns
    */
   ongoingStateUpdate(deltaTime) {
-    let pos, animationPos, collision = false;
+    let pos,
+      animationPos,
+      eatenPiece,
+      collision = false;
+
     switch (this.state) {
+      case gameState.Player1PickingPiece:
+        if (
+          this.lastMove != undefined &&
+          this.lastMove.piece.animation != undefined
+        ) {
+          this.lastMove.piece.animation.update(deltaTime);
+          if (this.lastMove.piece.animation.isOver()) {
+            this.board.undoMove(this.lastMove);
+            this.lastMove.piece.animation = undefined;
+
+            //Animation of the piece that was eaten
+
+            if (this.lastMove.pieceEaten == undefined) {
+              this.setState(gameState.Player2PickingPiece);
+              this.lastMove = undefined;
+            } else if (this.lastMove.pieceEaten.getType() == "white") {
+              this.lastMove.pieceEaten.animation = new MyCircularAnimation(
+                this.scene,
+                this.whiteAuxBoard.getLastAddedTile().getDisplayCoords(),
+                this.lastMove.pieceEatenTile.getDisplayCoords(),
+                1000,
+                false
+              );
+            } else if (this.lastMove.pieceEaten.getType() == "black") {
+              this.lastMove.pieceEaten.animation = new MyCircularAnimation(
+                this.scene,
+                this.blackAuxBoard.getLastAddedTile().getDisplayCoords(),
+                this.lastMove.pieceEatenTile.getDisplayCoords(),
+                1000,
+                false
+              );
+            }
+          }
+        } else if (
+          this.lastMove != undefined &&
+          this.lastMove.pieceEaten != undefined &&
+          this.lastMove.pieceEaten.animation != undefined
+        ) {
+          this.lastMove.pieceEaten.animation.update(deltaTime);
+          if (this.lastMove.pieceEaten.animation.isOver()) {
+            this.lastMove.pieceEaten.animation = undefined;
+            if (this.lastMove.pieceEaten.getType() == "white")
+              eatenPiece = this.whiteAuxBoard.undoMove(this.lastMove);
+            else eatenPiece = this.blackAuxBoard.undoMove(this.lastMove);
+            this.board.addPiece(eatenPiece, this.lastMove.pieceEatenTile);
+            if (this.lastMove.pieceEaten.getType() == "white")
+              this.setState(gameState.Player2PickingPiece);
+            else {
+              this.setState(gameState.Player1PickingPiece);
+            }
+
+            this.lastMove = undefined;
+          }
+        }
+
+        break;
+      case gameState.Player2PickingPiece:
+        if (
+          this.lastMove != undefined &&
+          this.lastMove.piece.animation != undefined
+        ) {
+          this.lastMove.piece.animation.update(deltaTime);
+          if (this.lastMove.piece.animation.isOver()) {
+            this.board.undoMove(this.lastMove);
+            this.lastMove.piece.animation = undefined;
+
+            //Animation of the piece that was eaten
+
+            if (this.lastMove.pieceEaten == undefined) {
+              this.setState(gameState.Player1PickingPiece);
+              this.lastMove = undefined;
+            } else if (this.lastMove.pieceEaten != undefined) {
+              if (this.lastMove.pieceEaten.getType() == "white") {
+                this.lastMove.pieceEaten.animation = new MyCircularAnimation(
+                  this.scene,
+                  this.whiteAuxBoard.getLastAddedTile().getDisplayCoords(),
+                  this.lastMove.pieceEatenTile.getDisplayCoords(),
+                  1000,
+                  false
+                );
+              } else {
+                this.lastMove.pieceEaten.animation = new MyCircularAnimation(
+                  this.scene,
+                  this.blackAuxBoard.getLastAddedTile().getDisplayCoords(),
+                  this.lastMove.pieceEatenTile.getDisplayCoords(),
+                  1000,
+                  false
+                );
+              }
+            }
+          }
+        } else if (
+          this.lastMove != undefined &&
+          this.lastMove.pieceEaten != undefined &&
+          this.lastMove.pieceEaten.animation != undefined
+        ) {
+          this.lastMove.pieceEaten.animation.update(deltaTime);
+          if (this.lastMove.pieceEaten.animation.isOver()) {
+            this.lastMove.pieceEaten.animation = undefined;
+            if (this.lastMove.pieceEaten.getType() == "white")
+              eatenPiece = this.whiteAuxBoard.undoMove(this.lastMove);
+            else eatenPiece = this.blackAuxBoard.undoMove(this.lastMove);
+            this.board.addPiece(eatenPiece, this.lastMove.pieceEatenTile);
+            if (this.lastMove.pieceEaten.getType() == "white")
+              this.setState(gameState.Player2PickingPiece);
+            else {
+              this.setState(gameState.Player1PickingPiece);
+            }
+            this.lastMove = undefined;
+          }
+        }
+        break;
       case gameState.Player1MovingPiece:
         this.availablePieces = undefined;
         this.availableDestinations = undefined;
@@ -274,51 +406,60 @@ class MyGame {
         this.selectedPiece.animation.update(deltaTime);
         pos = this.selectedPiece.animation.getCurrentPos();
 
-        if(this.pieceEaten!=undefined)collision = this.detectCollision(pos, this.pieceEaten.getTile().getDisplayCoords())
-        
-        if(collision){
+        if (this.pieceEaten != undefined)
+          collision = this.detectCollision(
+            pos,
+            this.pieceEaten.getTile().getDisplayCoords()
+          );
+
+        if (collision) {
           this.selectedPiece.animation.stop();
-          if(this.pieceEaten.animation == undefined){
-            this.pieceEaten.animation = new MyCircularAnimation(this.scene, 
+          if (this.pieceEaten.animation == undefined) {
+            this.pieceEaten.animation = new MyCircularAnimation(
+              this.scene,
               this.pieceEaten.getTile().getDisplayCoords(),
               this.blackAuxBoard.getNextEmptyTile().getDisplayCoords(),
-              2000)
+              2000,
+              true
+            );
           }
 
           this.pieceEaten.animation.update(deltaTime);
-          if(this.pieceEaten.animation.isOver()){
+          if (this.pieceEaten.animation.isOver()) {
             this.pieceEaten.animation = undefined;
             this.board.removePiece(this.pieceEaten.getTile());
             this.blackAuxBoard.addPiece(this.pieceEaten);
-            this.selectedPiece.animation.start()
+            this.selectedPiece.animation.start();
           }
         }
 
-        if(this.selectedPiece.animation.isOver()){
+        if (this.selectedPiece.animation.isOver()) {
           this.selectedPiece.animation = undefined;
-
-            //Animate piece
-          if(this.board.movePiece(
-            this.selectedPiece,
-            this.board.getTile(this.selectedPiece),
-            this.selectedDestination
-          )){
-            this.move.turnKing()
+          console.log(this.pieceEaten);
+          if (
+            this.board.movePiece(
+              this.selectedPiece,
+              this.board.getTile(this.selectedPiece),
+              this.selectedDestination
+            )
+          ) {
+            this.move.turnKing();
           }
-          
-          this.gameSequence.addMove(this.move);
-          this.move = undefined
-          if (this.pieceEaten != undefined) {
 
+          this.gameSequence.addMove(this.move);
+          this.move = undefined;
+          console.log(this.pieceEaten);
+          if (this.pieceEaten != undefined) {
             this.selectedPiece = this.board
               .getTileByCoords(this.selectedDestination.coords)
               .getPiece();
             this.pieceEaten = undefined;
             this.selectedDestination = undefined;
-  
+
             let availableDestinations = this.board.getAvailableDestinations(
               this.selectedPiece
             );
+            console.log(availableDestinations);
             for (let i = 0; i < availableDestinations.length; i++) {
               if (
                 this.board.isPieceBetween(
@@ -337,7 +478,7 @@ class MyGame {
           this.selectedDestination = undefined;
           this.setState(gameState.Player2PickingPiece);
         }
-      break;
+        break;
       case gameState.Player2MovingPiece:
         this.availablePieces = undefined;
         this.availableDestinations = undefined;
@@ -345,52 +486,62 @@ class MyGame {
         this.selectedPiece.animation.update(deltaTime);
         pos = this.selectedPiece.animation.getCurrentPos();
 
-        if(this.pieceEaten!=undefined)collision = this.detectCollision(pos, this.pieceEaten.getTile().getDisplayCoords())
-        
-        if(collision){
+        if (this.pieceEaten != undefined)
+          collision = this.detectCollision(
+            pos,
+            this.pieceEaten.getTile().getDisplayCoords()
+          );
+
+        if (collision) {
           this.selectedPiece.animation.stop();
-          if(this.pieceEaten.animation == undefined){
-            this.pieceEaten.animation = new MyCircularAnimation(this.scene, 
+          if (this.pieceEaten.animation == undefined) {
+            this.pieceEaten.animation = new MyCircularAnimation(
+              this.scene,
               this.pieceEaten.getTile().getDisplayCoords(),
               this.whiteAuxBoard.getNextEmptyTile().getDisplayCoords(),
-              2000)
+              2000,
+              true
+            );
           }
 
           this.pieceEaten.animation.update(deltaTime);
-          if(this.pieceEaten.animation.isOver()){
+          if (this.pieceEaten.animation.isOver()) {
             this.pieceEaten.animation = undefined;
             this.board.removePiece(this.pieceEaten.getTile());
             this.whiteAuxBoard.addPiece(this.pieceEaten);
-            this.pieceEaten = undefined;
-            this.selectedPiece.animation.start()
+            this.selectedPiece.animation.start();
           }
         }
 
-        if(this.selectedPiece.animation.isOver()){
+        if (this.selectedPiece.animation.isOver()) {
           this.selectedPiece.animation = undefined;
 
-            //Animate piece
-          if(this.board.movePiece(
-            this.selectedPiece,
-            this.board.getTile(this.selectedPiece),
-            this.selectedDestination
-          )){
-            this.move.turnKing()
+          //Animate piece
+          console.log(this.pieceEaten);
+          if (
+            this.board.movePiece(
+              this.selectedPiece,
+              this.board.getTile(this.selectedPiece),
+              this.selectedDestination
+            )
+          ) {
+            this.move.turnKing();
           }
-          
-          this.gameSequence.addMove(this.move);
-          this.move = undefined
-          if (this.pieceEaten != undefined) {
 
+          this.gameSequence.addMove(this.move);
+          this.move = undefined;
+          console.log(this.pieceEaten);
+          if (this.pieceEaten != undefined) {
             this.selectedPiece = this.board
               .getTileByCoords(this.selectedDestination.coords)
               .getPiece();
             this.pieceEaten = undefined;
             this.selectedDestination = undefined;
-  
+
             let availableDestinations = this.board.getAvailableDestinations(
               this.selectedPiece
             );
+            console.log(availableDestinations);
             for (let i = 0; i < availableDestinations.length; i++) {
               if (
                 this.board.isPieceBetween(
@@ -409,60 +560,74 @@ class MyGame {
           this.selectedDestination = undefined;
           this.setState(gameState.Player1PickingPiece);
         }
-      break;
-
-
+        break;
     }
   }
 
   update(deltaTime) {
     this.ongoingStateUpdate(deltaTime);
+    this.updateSpot();
   }
 
-        
+  updateSpot() {
+    let light = this.scene.lights.find((light) => light.name == "chasing");
+    if (light == undefined) {
+      return;
+    }
 
+    if (this.selectedPiece != undefined) {
+      //Search for light with attribute name "chasing"
+
+      if (this.selectedPiece.animation != undefined) {
+        light.setPosition(
+          this.selectedPiece.animation.getCurrentPos()[0] + 0.5,
+          6,
+          this.selectedPiece.animation.getCurrentPos()[2] - 0.5,
+          1
+        );
+        light.enable();
+      } else {
+        light.setPosition(
+          this.selectedPiece.getTile().getDisplayCoords()[0] + 0.5,
+          6,
+          this.selectedPiece.getTile().getDisplayCoords()[2] - 0.5,
+          1
+        );
+        light.enable();
+      }
+    } else {
+      light.disable();
+    }
+
+    light.update();
+    return;
+  }
 
   /**
    * Undoes the last move
    * Can only be called during the Player1/2PickingPiece states
    */
-  undoMove(){
-    let lastMove = this.gameSequence.undoMove();
-    if(lastMove == null) return;
+  undoMove() {
+    if (this.lastMove != undefined) return;
+    this.lastMove = this.gameSequence.undoMove();
+    if (this.lastMove == null) return;
 
-    this.board.undoMove(lastMove);
-
-    let eatenPiece;
-  
-    if(lastMove.pieceEaten != undefined && lastMove.pieceEaten.getType() == "black"){
-      eatenPiece=  this.blackAuxBoard.undoMove(lastMove);
-    }
-    else if (lastMove.pieceEaten != undefined && lastMove.pieceEaten.getType() == "white"){
-      eatenPiece = this.whiteAuxBoard.undoMove(lastMove);
-    }
-
-    if(eatenPiece != null){
-      this.board.addPiece(eatenPiece, lastMove.pieceEatenTile);
-    }
-
-    let pieceColor = lastMove.piece.getType();
-    if(pieceColor == "white"){
-      this.setState(gameState.Player1PickingPiece);
-    }
-    else if(pieceColor == "black"){
-      this.setState(gameState.Player2PickingPiece);
-    }
-
+    //Add animation to piece
+    this.lastMove.piece.animation = new MySimpleAnimation(
+      this.scene,
+      this.lastMove.endingTile.getDisplayCoords(),
+      this.lastMove.startingTile.getDisplayCoords(),
+      1000
+    );
   }
 
   /**
    * Resets the game and the boards
    */
-  reset(){
+  reset() {
     this.board = new MyBoard(this.scene, this);
     this.whiteAuxBoard = new MyAuxBoard(this.scene, "white");
     this.blackAuxBoard = new MyAuxBoard(this.scene, "black");
-    this.gameSequence = new MyGameSequence();
     this.animator = new MyAnimator(this, this.gameSequence);
 
     this.selectedPiece = undefined;
@@ -470,7 +635,6 @@ class MyGame {
     this.availablePieces = undefined;
     this.availableDestinations = undefined;
     this.pieceEaten = undefined;
-
   }
 
   playMovie() {

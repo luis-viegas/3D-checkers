@@ -2,6 +2,7 @@ import { CGFappearance, CGFlight, CGFscene, CGFshader } from "../lib/CGF.js";
 import { CGFaxis, CGFcamera } from "../lib/CGF.js";
 import { MyGame, gameState } from "./myGame.js";
 import { MyCameraAnimation } from "./MyCameraAnimation.js";
+import { InfiniteAnimation } from "./InfiniteAnimation.js";
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -42,6 +43,7 @@ export class XMLscene extends CGFscene {
     super.init(application);
 
     this.sceneInited = false;
+    this.currentScene = "SciFi-Scene";
 
     this.enableTextures(true);
 
@@ -54,7 +56,7 @@ export class XMLscene extends CGFscene {
     this.setUpdatePeriod(1000);
     //This variable allows to change between materials pressing the button m/M
     this.currentMaterial = 0;
-    this.setPickEnabled(false);
+    this.setPickEnabled(true);
 
     // this variable allows to display the axis (it starts disabled)
     this.displayAxis = false;
@@ -69,11 +71,15 @@ export class XMLscene extends CGFscene {
     //This is used to create a deep copy of the camera
 
     let starterCameraConfigs = this.graph.views[this.graph.default_view];
-    this.camera = new CGFcamera(starterCameraConfigs.fov, 
-      starterCameraConfigs.near, starterCameraConfigs.far,
-      starterCameraConfigs.position, starterCameraConfigs.target);
+    this.camera = new CGFcamera(
+      starterCameraConfigs.fov,
+      starterCameraConfigs.near,
+      starterCameraConfigs.far,
+      starterCameraConfigs.position,
+      starterCameraConfigs.target
+    );
 
-    this.interface.setActiveCamera(this.camera);
+    //this.interface.setActiveCamera(this.camera);
   }
   /**
    * Initializes the scene lights with the values read from the XML file.
@@ -125,7 +131,11 @@ export class XMLscene extends CGFscene {
           let location = light[2];
           let target = light[9];
           // Substract the target from the location to get the direction
-          let direction = [target[0]-location[0],target[1]-location[1], target[2]-location[2]];
+          let direction = [
+            target[0] - location[0],
+            target[1] - location[1],
+            target[2] - location[2],
+          ];
           //Normalize the direction vector
           let magnitude = Math.sqrt(
             direction[0] * direction[0] +
@@ -144,7 +154,7 @@ export class XMLscene extends CGFscene {
           );
         }
 
-        this.lights[i].setVisible(true);
+        this.lights[i].setVisible(false);
         if (light[0]) this.lights[i].enable();
         else this.lights[i].disable();
 
@@ -205,6 +215,16 @@ export class XMLscene extends CGFscene {
     // additional texture will have to be bound to texture unit 1 later, when using the shader, with "this.texture2.bind(1);"
   }
 
+  addAnimations() {
+    //Add rotating animation to the component with name "saturn"
+    let saturn = this.graph.components["saturn"];
+    saturn.animation = new InfiniteAnimation(this, null, 5000);
+
+    //Add pulsing animation to the component with name "tesseract"
+    let tesseract = this.graph.components["tesseract"];
+    tesseract.animation = new InfiniteAnimation(this, [0, 0.5, 0], 5000);
+  }
+
   /** Handler called when the graph is finally loaded.
    * As loading is asynchronous, this may be called already after the application has started the run loop
    */
@@ -231,11 +251,13 @@ export class XMLscene extends CGFscene {
 
     this.initShaders();
 
-    this.interface.lightsConfig();
+    //this.interface.lightsConfig();
 
     this.interface.camerasConfig();
 
-    this.interface.highlightConfig();
+    //this.interface.highlightConfig();
+
+    this.addAnimations();
 
     this.game = new MyGame(this);
 
@@ -246,9 +268,9 @@ export class XMLscene extends CGFscene {
     this.startTime = null;
   }
 
-  //Handler of m key press
+  //Handler of s key press
   startGame() {
-    if(this.game.state == gameState.NotStarted){
+    if (this.game.state == gameState.NotStarted) {
       this.game.setState(gameState.Player2PickingPiece);
       alert("Game started!");
     }
@@ -262,11 +284,13 @@ export class XMLscene extends CGFscene {
   }
 
   undoMove() {
-    if(this.game.state == gameState.Player1PickingPiece || this.game.state == gameState.Player2PickingPiece){
+    if (
+      this.game.state == gameState.Player1PickingPiece ||
+      this.game.state == gameState.Player2PickingPiece
+    ) {
       this.game.undoMove();
     }
   }
-
 
   updateAxis() {
     console.log("Axis updated");
@@ -277,15 +301,20 @@ export class XMLscene extends CGFscene {
     console.log("Lights updated");
   }
 
-  updateCamera(cameraId){
+  updateCamera(cameraId) {
+    console.log(cameraId);
     //Animate the camera to the new position
-    if(this.cameraAnimation != null){
-      return
+    if (this.cameraAnimation != null) {
+      return;
     }
-    let nextCamera = this.graph.views[cameraId]
+    let nextCamera = this.graph.views[cameraId];
     this.setPickEnabled(false);
-    this.cameraAnimation = new MyCameraAnimation(this, this.camera, nextCamera.position, nextCamera.target);
-
+    this.cameraAnimation = new MyCameraAnimation(
+      this,
+      this.camera,
+      nextCamera.position,
+      nextCamera.target
+    );
   }
 
   update(time) {
@@ -297,11 +326,11 @@ export class XMLscene extends CGFscene {
     //Update animations on each component of the scene
     for (let key in this.graph.components) {
       if (this.graph.components[key].animation != null) {
-        this.graph.components[key].animation.update(time - this.startTime);
+        this.graph.components[key].animation.update(time - this.lastTime);
       }
     }
 
-    if(this.testShaders!=undefined){
+    if (this.testShaders != undefined) {
       this.testShaders[1].setUniformsValues({
         timeFactor: (time / 100) % 100,
       });
@@ -311,24 +340,23 @@ export class XMLscene extends CGFscene {
      * Update the camera animation
      */
 
-    if(this.cameraAnimation != null){
+    if (this.cameraAnimation != null) {
       this.cameraAnimation.update(time - this.lastTime);
 
-      if(this.cameraAnimation.isOver()){
+      if (this.cameraAnimation.isOver()) {
         this.cameraAnimation = null;
         this.setPickEnabled(true);
       }
-  
     }
 
     /**
      * Update the game
      */
-    this.game.update(time - this.lastTime);
+    if (this.game != undefined) {
+      this.game.update(time - this.lastTime);
+    }
 
     this.lastTime = time;
-
-   
   }
 
   /**
@@ -353,9 +381,7 @@ export class XMLscene extends CGFscene {
     this.applyViewMatrix();
 
     this.pushMatrix();
-    
-    this.setActiveShader(this.defaultShader);
-  
+
     // Draw axis
     if (this.displayAxis) {
       this.axis.display();
@@ -368,7 +394,13 @@ export class XMLscene extends CGFscene {
     // Displays the scene (MySceneGraph function).
     const idRoot = this.graph.idRoot;
     const root = this.graph.components[idRoot];
-    this.drawComponent(root, null, null);
+    const scenes = root.children;
+    for (let i = 0; i < scenes.length; i++) {
+      if (scenes[i].name == this.currentScene) {
+        this.drawComponent(scenes[i], null, null);
+      }
+    }
+    //this.drawComponent(root, null, null);
 
     this.popMatrix();
     // ---- END Background, camera and axis setup
@@ -423,15 +455,11 @@ export class XMLscene extends CGFscene {
     for (let i = 0; i < component.children.length; i++) {
       this.pushMatrix();
 
-      if(component.children[i].name == "game"){
+      if (component.children[i].name == "game") {
         this.game.display();
-      }
-      else{
+      } else {
         this.drawComponent(component.children[i], appearenceId, textParent);
       }
-
-      
-
       this.popMatrix();
     }
 
@@ -441,7 +469,7 @@ export class XMLscene extends CGFscene {
 
     currentApperence.setTexture(currTexture);
 
-    if(currTexture!=null){
+    if (currTexture != null) {
       this.gl.texParameteri(
         this.gl.TEXTURE_2D,
         this.gl.TEXTURE_WRAP_S,
@@ -454,7 +482,6 @@ export class XMLscene extends CGFscene {
       );
     }
 
-    
     if (component.highlighted != undefined) {
       if (component.isHighlighted == true) {
         this.setActiveShader(this.testShaders[1]);
@@ -466,18 +493,33 @@ export class XMLscene extends CGFscene {
         });
       }
     }
-    
 
+    if (
+      this.game != undefined &&
+      (this.game.state == gameState.Player1PickingPiece ||
+        this.game.state == gameState.Player2PickingPiece)
+    ) {
+      if (component.name == "undo") {
+        this.registerForPick(1000, component);
+      }
+    }
+
+    if (component.name == "cameraWhite") {
+      this.registerForPick(1001, component);
+    }
+
+    if (component.name == "cameraBlack") {
+      this.registerForPick(1002, component);
+    }
+
+    if (component.name == "cameraMiddle") {
+      this.registerForPick(1003, component);
+    }
     currentApperence.apply();
 
     for (let j = 0; j < component.primitives.length; j++) {
       component.primitives[j].updateTexCoords(length_s, length_t);
       component.primitives[j].display();
     }
-    
-    if (component.highlighted != undefined) {
-      this.setActiveShader(this.defaultShader);
-    }
-    
   }
 }

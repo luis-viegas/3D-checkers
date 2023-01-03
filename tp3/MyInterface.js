@@ -43,11 +43,14 @@ export class MyInterface extends CGFinterface {
     if (event.key == "s" || event.key == "S") {
       this.scene.startGame();
     }
-    if(event.key == "r" || event.key == "R"){
+    if (event.key == "r" || event.key == "R") {
       this.scene.resetGame();
     }
-    if(event.key == "u" || event.key == "U"){
+    if (event.key == "u" || event.key == "U") {
       this.scene.undoMove();
+    }
+    if (event.key == "f" || event.key == "F") {
+      this.scene.playMovie();
     }
 
     this.activeKeys[event.code] = true;
@@ -65,12 +68,9 @@ export class MyInterface extends CGFinterface {
    * Adds a folder containing general configs
    */
   generalConfig() {
-    let folder = this.gui.addFolder("General Configs");
-
-    folder
-      .add(this.scene, "displayAxis")
-      .name("Display Axis")
-      .onChange(this.scene.updateAxis.bind(this.scene));
+    this.gui
+      .add(this.scene, "currentScene", ["SciFi-Scene", "Park-Scene"])
+      .name("Scene");
   }
 
   /**

@@ -210,7 +210,8 @@ export class MySceneGraph {
         this.onXMLMinorError("tag <components> out of order");
 
       //Parse components block
-      if ((error = this.parseComponents(nodes[index])) != null) return error;
+      if ((error = this.parseSceneComponents(nodes[index])) != null)
+        return error;
     }
     this.log("all parsed");
   }
@@ -1149,7 +1150,11 @@ export class MySceneGraph {
         let rotationXAngle = this.reader.getFloat(rotationX, "angle");
         if (rotationXAngle == null) return "no angle defined for rotationX";
 
-        keyframe.rotation = [DEGREE_TO_RAD* rotationXAngle, DEGREE_TO_RAD* rotationYAngle, DEGREE_TO_RAD* rotationZAngle];
+        keyframe.rotation = [
+          DEGREE_TO_RAD * rotationXAngle,
+          DEGREE_TO_RAD * rotationYAngle,
+          DEGREE_TO_RAD * rotationZAngle,
+        ];
 
         let scaleX = this.reader.getFloat(scale, "sx");
         if (scaleX == null) return "no x defined for scale";
@@ -1173,6 +1178,10 @@ export class MySceneGraph {
     }
 
     console.log(this.animations);
+  }
+
+  parseSceneComponents(sceneComponentsNode) {
+    this.parseComponents(sceneComponentsNode);
   }
 
   /**

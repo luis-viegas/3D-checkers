@@ -13,9 +13,13 @@ class MyTile {
     return this.piece;
   }
 
+  setBoardType(boardType) {
+    this.boardType = boardType;
+  }
+
   setPiece(piece) {
     this.piece = piece;
-    if(piece == null) return;
+    if (piece == null) return;
     this.piece.setTile(this);
   }
   removePiece() {
@@ -32,7 +36,7 @@ class MyTile {
   }
 
   getDisplayCoords() {
-    return [this.coords.x, 0 , -this.coords.y ];
+    return [this.coords.x, 0, -this.coords.y];
   }
 
   print() {
@@ -57,7 +61,10 @@ class MyTile {
       if (this.getTileColor() === "white") {
         this.scene.graph.appearences["white"].apply();
       } else {
-        this.scene.graph.appearences["black"].apply();
+        this.scene.graph.appearences["brown"].setTexture(
+          this.scene.graph.textures["woodTable"]
+        );
+        this.scene.graph.appearences["brown"].apply();
       }
     }
 
