@@ -14,6 +14,14 @@ Developed by:
 A 3d version of the checkers game made as part of the Masters in Software Engineering.
 The game was developed using webGL and the [WebCGF](https://paginas.fe.up.pt/~ruirodrig/pub/sw/webcgf/docs/) framework and using the but everything else was made from scratch.
 
+# Screenshots
+
+![Screenshot of checkers game](./game/screenshots/SGI3_T6_G10_1.png)
+![Screenshot of checkers game](./game/screenshots/SGI3_T6_G10_2.png)
+![Screenshot of checkers game](./game/screenshots/SGI3_T6_G10_3.png)
+![Screenshot of checkers game](./game/screenshots/SGI3_T6_G10_4.png)
+![Screenshot of checkers game](./game/screenshots/SGI3_T6_G10_5.png)
+
 ### How to run?
 
 Start a live server on the root folder and navigate to the "game" folder
